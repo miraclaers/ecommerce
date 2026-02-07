@@ -27,11 +27,45 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <main className="p-8">
-        <p>Your cart is empty.</p>
-        <Link href="/" className="text-violet-600 underline">
-          Go back to products
-        </Link>
+      <main className="p-8 max-w-3xl mx-auto">
+        <section className="border border-dashed border-violet-300/70 rounded-2xl p-10 text-center bg-violet-50/40">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-8 w-8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="9" cy="20" r="1.8" />
+              <circle cx="17" cy="20" r="1.8" />
+              <path d="M3 4h2l2.6 11h9.8l2.1-7H7.1" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Your cart is empty
+          </h1>
+          <p className="mt-2 text-gray-600">
+            Add items before checking out.
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Link
+              href="/products"
+              className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition"
+            >
+              Browse products
+            </Link>
+            <Link
+              href="/"
+              className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition"
+            >
+              Back home
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }

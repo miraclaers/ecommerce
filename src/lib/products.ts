@@ -33,6 +33,20 @@ const PRODUCTS: Product[] = [
     description: "Gaming mouse pad with resistent fiber and anti-liquid properties",
     image: "/products/mousepad.jpg",
   },
+  {
+    id: "4",
+    title: "Smart Desk Lamp",
+    price: 85,
+    description: "Adjustable LED desk lamp with touch controls and warm light modes.",
+    image: "/products/keyboard.jpg",
+  },
+  {
+    id: "5",
+    title: "Portable Bluetooth Speaker",
+    price: 95,
+    description: "Compact speaker with deep bass, 12-hour battery, and water resistance.",
+    image: "/products/headphones.jpg",
+  },
 ];
 
 /**

@@ -8,7 +8,7 @@ export default function ProductsPage() {
     <main className="p-8">
       <h1 className="text-2xl font-bold mb-6">Products</h1>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-2">
         {products.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}

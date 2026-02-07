@@ -1,11 +1,12 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { getProductById, getProducts } from "@/lib/products";
 import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import ProductCard from "@/components/ProductCard";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -18,12 +19,12 @@ export default function ProductDetail() {
   >("description");
 
   if (!id) {
-    return <main className="p-8">Invalid product ID</main>;
+    notFound();
   }
 
   const product = getProductById(id);
   if (!product) {
-    return <main className="p-8">Product not found</main>;
+    notFound();
   }
 
   const relatedProducts = getProducts().filter(
@@ -66,7 +67,7 @@ export default function ProductDetail() {
 
           {added && (
             <p className="mt-4 text-green-600">
-              ✅ Product added to cart
+              Product added to cart
             </p>
           )}
 
@@ -106,22 +107,22 @@ export default function ProductDetail() {
 
               {activeTab === "shipping" && (
                 <ul className="space-y-2">
-                  <li>🚚 Free shipping over $100</li>
-                  <li>📦 30-day returns</li>
-                  <li>🛡️ 1-year warranty</li>
+                  <li>Free shipping over $100</li>
+                  <li>30-day returns</li>
+                  <li>1-year warranty</li>
                 </ul>
               )}
 
               {activeTab === "reviews" && (
                 <div className="space-y-4">
                   <div>
-                    ⭐⭐⭐⭐⭐ — <strong>Ana</strong>
+                    5/5 — <strong>Ana</strong>
                     <p>
                       Great quality, exceeded my expectations.
                     </p>
                   </div>
                   <div>
-                    ⭐⭐⭐⭐☆ — <strong>Lucas</strong>
+                    4/5 — <strong>Lucas</strong>
                     <p>
                       Very good product, fast delivery.
                     </p>
@@ -139,28 +140,9 @@ export default function ProductDetail() {
           Related products
         </h2>
 
-        <ul className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-2">
           {relatedProducts.map((p) => (
-            <li
-              key={p.id}
-              className="border rounded-xl p-4 hover:shadow-lg transition"
-            >
-              <Link href={`/product/${p.id}`}>
-                <Image
-                  src={p.image}
-                  alt={p.title}
-                  width={300}
-                  height={300}
-                  className="rounded-lg mb-4"
-                />
-                <h3 className="font-semibold">
-                  {p.title}
-                </h3>
-                <p className="text-violet-600 font-semibold mt-2">
-                  ${p.price}
-                </p>
-              </Link>
-            </li>
+            <ProductCard key={p.id} product={p} />
           ))}
         </ul>
       </section>

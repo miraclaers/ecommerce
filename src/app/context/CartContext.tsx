@@ -4,6 +4,8 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
+  useRef,
   ReactNode,
 } from "react";
 
@@ -27,6 +29,38 @@ const CartContext = createContext<CartContextType | undefined>(
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const hasLoaded = useRef(false);
+  const storageKey = "minishop_cart";
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) {
+        hasLoaded.current = true;
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setCart(
+          parsed.filter(
+            (item: CartItem) =>
+              item &&
+              typeof item.id === "string" &&
+              typeof item.quantity === "number"
+          )
+        );
+      }
+    } catch {
+      // Ignore corrupted storage values
+    } finally {
+      hasLoaded.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoaded.current) return;
+    localStorage.setItem(storageKey, JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (id: string) => {
     setCart((prev) => {
