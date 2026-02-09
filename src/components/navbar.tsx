@@ -1,21 +1,17 @@
+import Link from "next/link";
+
 export default function Navbar() {
-return (
-    <nav className="w-full h-16 border-b">
-    <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
-
-        {/* Logo */}
-        <div className="text-xl font-bold">
-        MiniShop
-        </div>
-
-        {/* Links */}
-        <ul className="flex gap-6 text-sm font-medium">
-            <li className="cursor-pointer">Inicio</li>
-            <li className="cursor-pointer">Productos</li>
-            <li className="cursor-pointer">Contacto</li>
-        </ul>
-
-    </div>
-    </nav>
-);
+  return (
+    <footer className="w-full border-t bg-white">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 text-sm text-zinc-600">
+        <span>© {new Date().getFullYear()} MiniShop</span>
+        <Link
+          href="https://placeholder-portfolio.example"
+          className="rounded-md border border-zinc-200 px-3 py-1.5 font-medium text-zinc-700 hover:bg-zinc-50"
+        >
+          Portfolio (placeholder)
+        </Link>
+      </div>
+    </footer>
+  );
 }
