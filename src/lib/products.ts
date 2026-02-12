@@ -15,37 +15,23 @@ const PRODUCTS: Product[] = [
   {
     id: "1",
     title: "Wireless Headphones",
-    price: 120,
-    description: "High-quality wireless headphones with noise cancellation.",
+    price: 129,
+    description: "Over-ear wireless headphones with clear audio and active noise canceling.",
     image: "/products/headphones.jpg",
   },
   {
     id: "2",
     title: "Mechanical Keyboard",
-    price: 200,
-    description: "Mechanical keyboard with customizable RGB lighting.",
+    price: 149,
+    description: "Tactile mechanical keyboard with durable switches and customizable RGB lighting.",
     image: "/products/keyboard.jpg",
   },
   {
     id: "3",
     title: "Gaming Mouse Pad",
-    price: 70,
-    description: "Gaming mouse pad with resistent fiber and anti-liquid properties",
+    price: 39,
+    description: "Large gaming mouse pad with smooth tracking, stitched edges, and spill resistance.",
     image: "/products/mousepad.jpg",
-  },
-  {
-    id: "4",
-    title: "Smart Desk Lamp",
-    price: 85,
-    description: "Adjustable LED desk lamp with touch controls and warm light modes.",
-    image: "/products/keyboard.jpg",
-  },
-  {
-    id: "5",
-    title: "Portable Bluetooth Speaker",
-    price: 95,
-    description: "Compact speaker with deep bass, 12-hour battery, and water resistance.",
-    image: "/products/headphones.jpg",
   },
 ];
 

@@ -1,97 +1,66 @@
 # Mini Ecommerce (Next.js)
 
-Mini ecommerce project built for learning purposes, focused on **architecture, global state management, and purchase flow**, rather than visual design or a real backend.
+Mini Ecommerce is a demo store built with Next.js App Router, TypeScript, and React Context.
+The focus is on clean architecture, cart behavior, and a complete fake checkout flow.
 
-The goal of this project is to practice how a modern application is structured using **Next.js (App Router)**, **TypeScript**, and **React Context**, simulating a real ecommerce experience with fake data.
-
----
-
-## Tech Stack
-
-- **Next.js 14** (App Router)
-- **React**
-- **TypeScript**
-- **Tailwind CSS**
-- **Context API** (cart & state management)
-- Fake product database (no backend)
-
----
+Live URL: `https://mini-ecommerce-nextjs-psi.vercel.app`
 
 ## Features
 
-- Product listing
-- Product detail page
-- Shopping cart
-  - Add / remove products
-  - Update quantities
-  - Clear cart
-- Fake checkout flow
-- Global state using React Context
-- Product image support
+- Home page with demo intro and CTA
+- Product listing page
+- Product detail page by ID
+- Cart management
+- Add, remove, and update quantities
+- Fake checkout flow (`/checkout/pay`, `/checkout/success`, `/checkout/error`)
+- Global state via Context API (cart and orders)
+- Basic metadata setup for Open Graph and Twitter cards
 
----
+## Tech Stack
 
-## Project Structure
+- Next.js (App Router)
+- React
+- TypeScript
+- Tailwind CSS
+- Context API
+- Fake local product data (`src/lib/products.ts`)
 
-src/
-├─ app/
-│ ├─ page.tsx # Home
-│ ├─ products/ # Product list
-│ ├─ product/[id]/ # Product detail
-│ ├─ cart/ # Cart page
-│ ├─ checkout/ # Fake checkout
-│ └─ context/ # Global contexts
-│
-├─ components/
-│ └─ ProductCard.tsx
-│
-├─ lib/
-│ └─ products.ts # Fake product database
-│
-public/
-└─ products/ # Product images
+## Screenshots
 
----
+Add your screenshots to `public/screenshots/` and keep these names:
 
-## Product Data
+- `home.png`
+- `products.png`
+- `product-detail.png`
+- `cart.png`
+- `checkout.png`
 
-Products are fetched from a fake database file (`lib/products.ts`) that simulates a real data source:
+Then they will render in this README:
 
-- id
-- title
-- price
-- description
-- image
-
-This approach allows building the full ecommerce logic without relying on a backend.
-
----
-
-## Project Goals
-
-- Learn **Next.js App Router**
-- Understand **global state management without Redux**
-- Practice **component-based architecture**
-- Design real-world ecommerce flows
-- Build a solid foundation for future backend integration
-
----
-
-## Future Improvements
-
-- Real backend (API / database)
-- User authentication
-- Cart persistence
-- UI / UX improvements
-- Real checkout & payments
-- Testing
-
----
+![Home](./public/screenshots/home.png)
+![Products](./public/screenshots/products.png)
+![Product Detail](./public/screenshots/product-detail.png)
+![Cart](./public/screenshots/cart.png)
+![Checkout](./public/screenshots/checkout.png)
 
 ## Run Locally
 
 ```bash
 npm install
 npm run dev
-Open in your browser:
-http://localhost:3000
+```
+
+Open: `http://localhost:3000`
+
+## Project Structure (Key Files)
+
+- `src/app/page.tsx` - Home page
+- `src/app/products/page.tsx` - Product listing
+- `src/app/product/[id]/page.tsx` - Product detail
+- `src/app/cart/page.tsx` - Cart page
+- `src/app/checkout/*` - Checkout steps
+- `src/app/layout.tsx` - App layout and metadata
+- `src/lib/products.ts` - Product data source
+- `src/app/context/CartContext.tsx` - Cart global state
+- `src/app/context/OrdersContext.tsx` - Orders global state
+

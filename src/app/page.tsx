@@ -10,6 +10,9 @@ export default function HomePage() {
       <p className="mt-4 text-lg text-gray-600">
         A simple demo store built with Next.js, TypeScript and Context API.
       </p>
+      <p className="mt-2 text-sm text-gray-500">
+        About this demo: focused on clean UI, cart flow, and core e-commerce behavior.
+      </p>
 
       <div className="mt-10">
         <Link
