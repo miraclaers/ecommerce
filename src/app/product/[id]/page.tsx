@@ -5,7 +5,6 @@ import { getProductById, getProducts } from "@/lib/products";
 import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 
 export default function ProductDetail() {
@@ -116,13 +115,13 @@ export default function ProductDetail() {
               {activeTab === "reviews" && (
                 <div className="space-y-4">
                   <div>
-                    5/5 — <strong>Ana</strong>
+                    5/5 - <strong>Ana</strong>
                     <p>
                       Great quality, exceeded my expectations.
                     </p>
                   </div>
                   <div>
-                    4/5 — <strong>Lucas</strong>
+                    4/5 - <strong>Lucas</strong>
                     <p>
                       Very good product, fast delivery.
                     </p>

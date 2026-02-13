@@ -27,22 +27,15 @@ Live URL: `https://mini-ecommerce-nextjs-psi.vercel.app`
 
 ## Screenshots
 
-Add your screenshots to `public/screenshots/` and keep these names:
+Screenshots are optional but strongly recommended for portfolio presentation.
+
+If you add them, place files in `public/screenshots/` with names:
 
 - `home.png`
 - `products.png`
 - `product-detail.png`
 - `cart.png`
 - `checkout.png`
-
-Then they will render in this README:
-
-![Home](./public/screenshots/home.png)
-![Products](./public/screenshots/products.png)
-![Product Detail](./public/screenshots/product-detail.png)
-![Cart](./public/screenshots/cart.png)
-![Checkout](./public/screenshots/checkout.png)
-
 ## Run Locally
 
 ```bash
