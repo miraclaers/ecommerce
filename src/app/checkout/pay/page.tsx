@@ -11,8 +11,7 @@ export default function PayPage() {
     setLoading(true);
 
     setTimeout(() => {
-      const success = Math.random() > 0.5;
-      router.push(success ? "/checkout/success" : "/checkout/error");
+      router.push("/checkout/success");
     }, 1500);
   };
 
@@ -42,7 +41,7 @@ export default function PayPage() {
 
         <div className="mt-6 rounded-xl border bg-zinc-50 p-4 text-left">
           <p className="text-sm text-gray-500">Payment method</p>
-          <p className="font-semibold">Demo card •••• 4242</p>
+          <p className="font-semibold">Demo card **** 4242</p>
         </div>
 
         <button
