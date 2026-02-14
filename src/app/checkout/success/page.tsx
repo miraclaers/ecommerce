@@ -34,7 +34,7 @@ export default function CheckoutSuccessPage() {
 
   return (
     <main className="p-8 max-w-lg mx-auto">
-      <div className="border rounded-2xl p-8 bg-white shadow-sm text-center">
+      <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-600/10 text-green-700">
           <svg
             aria-hidden="true"
@@ -51,13 +51,13 @@ export default function CheckoutSuccessPage() {
         </div>
 
         <h1 className="text-2xl font-bold">Order completed</h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-gray-600 dark:text-zinc-300">
           Thanks for your purchase. Your order is confirmed.
         </p>
 
-        <div className="mt-6 rounded-xl border bg-zinc-50 p-4 text-left">
-          <p className="text-sm text-gray-500">Total paid</p>
-          <p className="text-xl font-bold text-zinc-900">
+        <div className="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 p-4 text-left">
+          <p className="text-sm text-gray-500 dark:text-zinc-400">Total paid</p>
+          <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
             ${total}
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function CheckoutSuccessPage() {
           </Link>
           <Link
             href="/"
-            className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition"
+            className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition dark:border-violet-400/40 dark:text-violet-300 dark:hover:bg-zinc-900"
           >
             Back home
           </Link>

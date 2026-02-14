@@ -7,10 +7,10 @@ export default function HomePage() {
         Mini Ecommerce
       </h1>
 
-      <p className="mt-4 text-lg text-gray-600">
+      <p className="mt-4 text-lg text-gray-600 dark:text-zinc-300">
         A simple demo store built with Next.js, TypeScript and Context API.
       </p>
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="mt-2 text-sm text-gray-500 dark:text-zinc-400">
         About this demo: focused on clean UI, cart flow, and core e-commerce behavior.
       </p>
 

@@ -17,7 +17,7 @@ export default function PayPage() {
 
   return (
     <main className="p-8 max-w-lg mx-auto">
-      <div className="border rounded-2xl p-8 bg-white shadow-sm text-center">
+      <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
           <svg
             aria-hidden="true"
@@ -35,12 +35,12 @@ export default function PayPage() {
         </div>
 
         <h1 className="text-2xl font-bold">Review and pay</h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-gray-600 dark:text-zinc-300">
           Secure checkout powered by a demo flow. Click confirm to simulate payment.
         </p>
 
-        <div className="mt-6 rounded-xl border bg-zinc-50 p-4 text-left">
-          <p className="text-sm text-gray-500">Payment method</p>
+        <div className="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 p-4 text-left">
+          <p className="text-sm text-gray-500 dark:text-zinc-400">Payment method</p>
           <p className="font-semibold">Demo card **** 4242</p>
         </div>
 
@@ -52,7 +52,7 @@ export default function PayPage() {
           {loading ? "Processing..." : "Confirm payment"}
         </button>
 
-        <p className="mt-4 text-xs text-gray-500">
+        <p className="mt-4 text-xs text-gray-500 dark:text-zinc-400">
           This is a demo checkout. No real payment is processed.
         </p>
       </div>

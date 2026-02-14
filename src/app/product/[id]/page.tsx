@@ -72,7 +72,7 @@ export default function ProductDetail() {
 
           {/* Tabs */}
           <div className="mt-10">
-            <div className="flex gap-6 border-b">
+            <div className="flex gap-6 border-b border-zinc-200 dark:border-zinc-800">
               {["description", "shipping", "reviews"].map(
                 (tab) => (
                   <button
@@ -85,7 +85,7 @@ export default function ProductDetail() {
                     className={`pb-2 capitalize ${
                       activeTab === tab
                         ? "border-b-2 border-violet-600 font-semibold"
-                        : "text-gray-500"
+                        : "text-gray-500 dark:text-zinc-400"
                     }`}
                   >
                     {tab}
@@ -95,7 +95,7 @@ export default function ProductDetail() {
             </div>
 
             {/* Tab content */}
-            <div className="mt-6 text-gray-600 text-sm">
+            <div className="mt-6 text-gray-600 dark:text-zinc-300 text-sm">
               {activeTab === "description" && (
                 <p>
                   {product.description} Lorem ipsum dolor sit amet,

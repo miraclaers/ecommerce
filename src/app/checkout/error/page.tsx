@@ -7,7 +7,7 @@ export default function CheckoutErrorPage() {
         Payment failed
       </h1>
 
-      <p className="mb-6">
+      <p className="mb-6 text-zinc-700 dark:text-zinc-300">
         Something went wrong. Please try again.
       </p>
 

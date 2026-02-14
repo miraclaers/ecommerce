@@ -12,7 +12,7 @@ export default function ProductCard({ product }: Props) {
   return (
     <li
       className="
-        border rounded-lg p-4
+        border rounded-lg p-4 bg-white/80 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800
         w-full mb-2 break-inside-avoid
         transition-all duration-300
         hover:shadow-xl hover:scale-[0.98]
@@ -29,8 +29,8 @@ export default function ProductCard({ product }: Props) {
       sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
       className="w-full h-40 rounded-md object-cover mb-3 bg-zinc-100/5 transition-all duration-300 ease-out group-hover/card:h-[12.5rem] group-hover/card:scale-[0.99]"
       />
-        <h3 className="font-semibold text-base">{product.title}</h3>
-        <p className="text-gray-600 mt-1 text-sm">${product.price}</p>
+        <h3 className="font-semibold text-base text-zinc-900 dark:text-zinc-100">{product.title}</h3>
+        <p className="text-gray-600 mt-1 text-sm dark:text-zinc-400">${product.price}</p>
       </Link>
 
       {/* Animated expandable section */}
@@ -43,7 +43,7 @@ export default function ProductCard({ product }: Props) {
           group-hover/card:max-h-36
         "
       >
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-zinc-400">
           {product.description}
         </p>
 

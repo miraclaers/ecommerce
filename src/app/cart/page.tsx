@@ -42,7 +42,7 @@ export default function CartPage() {
 
       {cartItemsWithData.length === 0 ? (
         <>
-          <section className="border border-dashed border-violet-300/70 rounded-2xl p-10 text-center bg-violet-50/40">
+          <section className="border border-dashed border-violet-300/70 rounded-2xl p-10 text-center bg-violet-50/40 dark:border-violet-500/40 dark:bg-violet-950/20">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
               <svg
                 aria-hidden="true"
@@ -59,10 +59,10 @@ export default function CartPage() {
                 <path d="M3 4h2l2.6 11h9.8l2.1-7H7.1" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">
               Your cart is empty
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-gray-600 dark:text-zinc-300">
               Looks like you haven&apos;t added anything yet. Find something you
               love.
             </p>
@@ -75,7 +75,7 @@ export default function CartPage() {
               </Link>
               <Link
                 href="/"
-                className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition"
+                className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition dark:border-violet-400/40 dark:text-violet-300 dark:hover:bg-zinc-900"
               >
                 Back home
               </Link>
@@ -99,7 +99,7 @@ export default function CartPage() {
             {cartItemsWithData.map((item) => (
               <li
                 key={item!.id}
-                className="border rounded-xl p-4 flex gap-4 items-start"
+                className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 flex gap-4 items-start bg-white/70 dark:bg-zinc-900/60"
               >
                 {/* Image placeholder */}
                 <Image
@@ -116,7 +116,7 @@ export default function CartPage() {
                     {item!.title}
                   </h3>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
                     {item!.description}
                   </p>
 
@@ -130,7 +130,7 @@ export default function CartPage() {
                       onClick={() =>
                         decreaseQuantity(item!.id)
                       }
-                      className="px-3 py-1 border rounded-lg hover:bg-gray-100"
+                      className="px-3 py-1 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                     >
                       -
                     </button>
@@ -139,7 +139,7 @@ export default function CartPage() {
                       onClick={() =>
                         increaseQuantity(item!.id)
                       }
-                      className="px-3 py-1 border rounded-lg hover:bg-gray-100"
+                      className="px-3 py-1 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                     >
                       +
                     </button>
@@ -173,6 +173,7 @@ export default function CartPage() {
                 rounded-lg
                 hover:bg-red-50
                 hover:border-red-400
+                dark:border-red-500/50 dark:text-red-400 dark:hover:bg-red-900/20
                 transition
               "
             >
