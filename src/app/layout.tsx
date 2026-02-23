@@ -1,9 +1,9 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Header from "@/components/Header";
-import Navbar from "@/components/navbar";
+import Header from "@/components/Header";;
 import { CartProvider } from "@/app/context/CartContext";
 import { OrdersProvider } from "@/app/context/OrdersContext";
+import Footer from "@/components/Footer";
 
 
 export const metadata: Metadata = {
@@ -46,7 +46,7 @@ export default function RootLayout({
             <main className="flex-1">
               {children}
             </main>
-            <Navbar />
+            <Footer />
           </OrdersProvider>
         </CartProvider>
       </body>

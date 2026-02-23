@@ -15,3 +15,13 @@
     @apply bg-zinc-50 text-zinc-900 antialiased transition-colors duration-200 dark:bg-zinc-950 dark:text-zinc-100;
   }
 }
+
+/* footer separator dot */
+.separator {
+  font-size: 1.25rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 8px;
+  color: #555;
+}
