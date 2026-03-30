@@ -74,11 +74,11 @@ export default function CheckoutPage() {
     <main className="p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
 
-      <ul className="space-y-4">
+      <ul className="space-y-6">
         {items.map((item) => (
           <li
             key={item!.id}
-            className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex justify-between bg-white/70 dark:bg-zinc-900/60"
+            className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 flex justify-between bg-white/70 dark:bg-zinc-900/60"
           >
             <div>
               <h3 className="font-semibold">{item!.title}</h3>

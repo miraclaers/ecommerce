@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { getProductById, getProducts } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 export default function CartPage() {
   const {
@@ -28,6 +30,15 @@ export default function CartPage() {
     .filter(Boolean);
 
   const suggestedProducts = getProducts().slice(0, 3);
+  const [showSuggestionSkeletons, setShowSuggestionSkeletons] =
+    useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSuggestionSkeletons(false);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, []);
 
   const total = cartItemsWithData.reduce(
     (acc, item) => acc + item!.subtotal,
@@ -86,20 +97,26 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold mb-6">
               Products you might be interested in
             </h2>
-            <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-2">
-              {suggestedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+            <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+              {showSuggestionSkeletons
+                ? Array.from({ length: 3 }).map((_, index) => (
+                    <ProductCardSkeleton
+                      key={`suggestion-skeleton-${index}`}
+                    />
+                  ))
+                : suggestedProducts.map((p) => (
+                    <ProductCard key={p.id} product={p} />
+                  ))}
             </ul>
           </section>
         </>
       ) : (
         <>
-          <ul className="space-y-4">
+          <ul className="space-y-6">
             {cartItemsWithData.map((item) => (
               <li
                 key={item!.id}
-                className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 flex gap-4 items-start bg-white/70 dark:bg-zinc-900/60"
+                className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 flex gap-5 items-start bg-white/70 dark:bg-zinc-900/60"
               >
                 {/* Image placeholder */}
                 <Image

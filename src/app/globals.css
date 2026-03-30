@@ -25,3 +25,83 @@
   margin: 0 8px;
   color: #555;
 }
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageFade 260ms ease-out;
+  will-change: transform, opacity;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.7) 0%,
+    rgba(248, 250, 252, 0.9) 50%,
+    rgba(226, 232, 240, 0.7) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(39, 39, 42, 0.9) 0%,
+    rgba(63, 63, 70, 0.9) 50%,
+    rgba(39, 39, 42, 0.9) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes badgePop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.25);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-badge-pop {
+  animation: badgePop 320ms ease-out;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-pop {
+  animation: toastIn 200ms ease-out;
+}

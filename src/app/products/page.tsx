@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getProducts, Product } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 export default function ProductsPage() {
   const products: Product[] = getProducts();
@@ -20,6 +21,14 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState<
     "newest" | "price-low" | "price-high" | "popular"
   >("newest");
+  const [showSkeletons, setShowSkeletons] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSkeletons(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     const normalizedMin = Math.min(minPrice, maxPrice);
@@ -147,10 +156,14 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-2">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+      <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+        {showSkeletons
+          ? Array.from({ length: 8 }).map((_, index) => (
+              <ProductCardSkeleton key={`product-skeleton-${index}`} />
+            ))
+          : filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
       </ul>
     </main>
   );

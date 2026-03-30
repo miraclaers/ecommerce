@@ -13,6 +13,9 @@ export default function HomePage() {
       <p className="mt-2 text-sm text-gray-500 dark:text-zinc-400">
         About this demo: focused on clean UI, cart flow, and core e-commerce behavior.
       </p>
+      <p className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-300">
+        Made by Alejo Castillo
+      </p>
 
       <div className="mt-10">
         <Link

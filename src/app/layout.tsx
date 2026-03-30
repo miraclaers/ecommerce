@@ -4,6 +4,7 @@ import Header from "@/components/Header";;
 import { CartProvider } from "@/app/context/CartContext";
 import { OrdersProvider } from "@/app/context/OrdersContext";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 
 
 export const metadata: Metadata = {
@@ -44,7 +45,9 @@ export default function RootLayout({
           <OrdersProvider>
             <Header />
             <main className="flex-1">
-              {children}
+              <PageTransition>
+                {children}
+              </PageTransition>
             </main>
             <Footer />
           </OrdersProvider>

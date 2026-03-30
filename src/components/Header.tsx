@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 
 const THEME_KEY = "minishop-theme";
@@ -11,6 +11,11 @@ export default function Header() {
   const itemCount = cart.reduce(
     (total, item) => total + item.quantity,
     0
+  );
+  const [animateBadge, setAnimateBadge] = useState(false);
+  const previousCount = useRef(itemCount);
+  const badgeTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null
   );
 
   useEffect(() => {
@@ -30,6 +35,26 @@ export default function Header() {
       nextTheme === "dark"
     );
   }, []);
+
+  useEffect(() => {
+    if (itemCount > previousCount.current) {
+      setAnimateBadge(true);
+      if (badgeTimer.current) {
+        clearTimeout(badgeTimer.current);
+      }
+      badgeTimer.current = setTimeout(() => {
+        setAnimateBadge(false);
+      }, 320);
+    }
+
+    previousCount.current = itemCount;
+
+    return () => {
+      if (badgeTimer.current) {
+        clearTimeout(badgeTimer.current);
+      }
+    };
+  }, [itemCount]);
 
   const toggleTheme = () => {
     const isDark =
@@ -118,7 +143,11 @@ export default function Header() {
               <path d="M3 4h2l2.6 11h9.8l2.1-7H7.1" />
             </svg>
             {itemCount > 0 ? (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[11px] font-semibold text-white">
+              <span
+                className={`absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[11px] font-semibold text-white ${
+                  animateBadge ? "cart-badge-pop" : ""
+                }`}
+              >
                 {itemCount}
               </span>
             ) : null}

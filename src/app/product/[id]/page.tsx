@@ -3,9 +3,11 @@
 import { notFound, useParams } from "next/navigation";
 import { getProductById, getProducts } from "@/lib/products";
 import { useCart } from "@/app/context/CartContext";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import ProductDetailSkeleton from "@/components/ProductDetailSkeleton";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -13,12 +15,21 @@ export default function ProductDetail() {
   const product = id ? getProductById(id) : undefined;
 
   const { addToCart } = useCart();
-  const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "description" | "shipping" | "reviews"
   >("description");
   const [activeImage, setActiveImage] = useState(
     product?.image ?? ""
+  );
+  const [showRelatedSkeletons, setShowRelatedSkeletons] =
+    useState(true);
+  const [showDetailSkeleton, setShowDetailSkeleton] =
+    useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null
   );
 
   if (!id || !product) {
@@ -37,42 +48,109 @@ export default function ProductDetail() {
     (p) => p.id !== product.id
   );
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowRelatedSkeletons(false);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowDetailSkeleton(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+      }
+    };
+  }, []);
+
+  const handleAddToCart = () => {
+    addToCart(product.id);
+    setShowToast(true);
+
+    if (toastTimer.current) {
+      clearTimeout(toastTimer.current);
+    }
+    toastTimer.current = setTimeout(() => {
+      setShowToast(false);
+    }, 2000);
+  };
+
+  if (showDetailSkeleton) {
+    return (
+      <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
+        <ProductDetailSkeleton />
+
+        <section>
+          <h2 className="text-2xl font-bold mb-6">
+            Related products
+          </h2>
+          <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <ProductCardSkeleton
+                key={`related-skeleton-${index}`}
+              />
+            ))}
+          </ul>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
       {/* Top section */}
       <section className="grid md:grid-cols-2 gap-12">
         {/* Image */}
-        <div className="border-4 border-violet-600 rounded-xl overflow-hidden">
-          <Image
-            src={activeImage}
-            alt={product.title}
-            width={500}
-            height={500}
-            className="object-cover w-full h-full"
-            priority
+        <div className="relative">
+          <div className="border-4 border-violet-600 rounded-xl overflow-hidden">
+            <div
+              className="relative"
+              onMouseEnter={() => setIsZooming(true)}
+              onMouseLeave={() => setIsZooming(false)}
+              onMouseMove={(event) => {
+                const rect =
+                  event.currentTarget.getBoundingClientRect();
+                const x =
+                  ((event.clientX - rect.left) / rect.width) *
+                  100;
+                const y =
+                  ((event.clientY - rect.top) / rect.height) *
+                  100;
+                setZoomPos({
+                  x: Math.max(0, Math.min(100, x)),
+                  y: Math.max(0, Math.min(100, y)),
+                });
+              }}
+            >
+              <Image
+                src={activeImage}
+                alt={product.title}
+                width={500}
+                height={500}
+                className="object-cover w-full h-full"
+                priority
+              />
+            </div>
+          </div>
+
+          <div
+            className={`pointer-events-none hidden md:block absolute top-0 left-full ml-6 h-[36rem] w-[36rem] rounded-xl border border-zinc-200 bg-white/70 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/60 ${
+              isZooming ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              backgroundImage: `url(${activeImage})`,
+              backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+              backgroundSize: "220%",
+              transition: "opacity 150ms ease-out",
+            }}
           />
-          <ul className="mt-4 flex gap-3 px-4 pb-4">
-            {galleryImages.map((img) => (
-              <li key={img}>
-                <button
-                  onClick={() => setActiveImage(img)}
-                  className={`h-16 w-16 overflow-hidden rounded-lg border ${
-                    img === activeImage
-                      ? "border-violet-600"
-                      : "border-zinc-200 dark:border-zinc-700"
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={product.title}
-                    width={64}
-                    height={64}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
 
 
@@ -85,20 +163,11 @@ export default function ProductDetail() {
           </p>
 
           <button
-            onClick={() => {
-              addToCart(product.id);
-              setAdded(true);
-            }}
-            className="mt-8 bg-violet-600 text-white px-6 py-3 rounded-xl hover:bg-violet-700 transition"
+            onClick={handleAddToCart}
+            className="mt-8 bg-violet-600 text-white px-6 py-3 rounded-xl hover:bg-violet-700 transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
           >
             Add to cart
           </button>
-
-          {added && (
-            <p className="mt-4 text-green-600">
-              Product added to cart
-            </p>
-          )}
 
           {/* Tabs */}
           <div className="mt-10">
@@ -127,34 +196,122 @@ export default function ProductDetail() {
             {/* Tab content */}
             <div className="mt-6 text-gray-600 dark:text-zinc-300 text-sm">
               {activeTab === "description" && (
-                <p>
-                  {product.description} Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit. Sed do eiusmod tempor
-                  incididunt ut labore et dolore magna aliqua.
-                </p>
+                <div className="space-y-4">
+                  <p>
+                    {product.description} Built for daily use with a
+                    focus on comfort, durability, and clean aesthetics.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-zinc-200 bg-white/70 p-4 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200">
+                      <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                        Category
+                      </p>
+                      <p className="mt-1 font-semibold">
+                        {product.category}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-zinc-200 bg-white/70 p-4 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200">
+                      <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                        Popularity
+                      </p>
+                      <p className="mt-1 font-semibold">
+                        {product.popularity} / 100
+                      </p>
+                    </div>
+                  </div>
+                  <ul className="grid gap-3 sm:grid-cols-2">
+                    <li className="rounded-lg border border-zinc-200 bg-white/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+                      Ergonomic fit for long sessions
+                    </li>
+                    <li className="rounded-lg border border-zinc-200 bg-white/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+                      Premium materials and matte finish
+                    </li>
+                    <li className="rounded-lg border border-zinc-200 bg-white/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+                      Balanced sound/feel with clear detail
+                    </li>
+                    <li className="rounded-lg border border-zinc-200 bg-white/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+                      Tested for everyday durability
+                    </li>
+                  </ul>
+                </div>
               )}
 
               {activeTab === "shipping" && (
-                <ul className="space-y-2">
-                  <li>Free shipping over $100</li>
-                  <li>30-day returns</li>
-                  <li>1-year warranty</li>
-                </ul>
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-zinc-200 bg-white/70 p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900/60">
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                      Estimated delivery
+                    </p>
+                    <p className="mt-1 text-zinc-600 dark:text-zinc-300">
+                      2–4 business days standard · 1–2 days express
+                    </p>
+                  </div>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 rounded-full bg-violet-600" />
+                      <span>
+                        Free shipping over $100, otherwise $6 flat rate.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 rounded-full bg-violet-600" />
+                      <span>
+                        30‑day returns, no questions asked.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 rounded-full bg-violet-600" />
+                      <span>
+                        1‑year warranty with fast replacements.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
               )}
 
               {activeTab === "reviews" && (
                 <div className="space-y-4">
-                  <div>
-                    5/5 - <strong>Ana</strong>
-                    <p>
-                      Great quality, exceeded my expectations.
+                  <div className="rounded-xl border border-zinc-200 bg-white/70 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      Average rating
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+                      {product.rating} / 5
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      Based on recent verified purchases.
                     </p>
                   </div>
-                  <div>
-                    4/5 - <strong>Lucas</strong>
-                    <p>
-                      Very good product, fast delivery.
-                    </p>
+
+                  <div className="space-y-3">
+                    <div className="rounded-xl border border-zinc-200 bg-white/70 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+                      <div className="flex items-center justify-between">
+                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                          Ana
+                        </p>
+                        <span className="text-xs text-zinc-500">
+                          Verified · 5/5
+                        </span>
+                      </div>
+                      <p className="mt-2 text-zinc-600 dark:text-zinc-300">
+                        Great quality and comfort. The build feels solid
+                        and the finish looks premium.
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-zinc-200 bg-white/70 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+                      <div className="flex items-center justify-between">
+                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                          Lucas
+                        </p>
+                        <span className="text-xs text-zinc-500">
+                          Verified · 4/5
+                        </span>
+                      </div>
+                      <p className="mt-2 text-zinc-600 dark:text-zinc-300">
+                        Smooth experience overall and quick delivery.
+                        I’d love a wider color selection.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -172,8 +329,8 @@ export default function ProductDetail() {
             </p>
           </div>
           <button
-            onClick={() => addToCart(product.id)}
-            className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-700"
+            onClick={handleAddToCart}
+            className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
           >
             Add to cart
           </button>
@@ -186,12 +343,24 @@ export default function ProductDetail() {
           Related products
         </h2>
 
-        <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-2">
-          {relatedProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+        <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+          {showRelatedSkeletons
+            ? Array.from({ length: 3 }).map((_, index) => (
+                <ProductCardSkeleton
+                  key={`related-skeleton-${index}`}
+                />
+              ))
+            : relatedProducts.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
         </ul>
       </section>
+
+      {showToast ? (
+        <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-violet-200 bg-white px-4 py-3 text-sm font-medium text-zinc-900 shadow-lg dark:border-violet-500/40 dark:bg-zinc-900 dark:text-zinc-100 toast-pop">
+          Added to cart
+        </div>
+      ) : null}
     </main>
   );
 }
