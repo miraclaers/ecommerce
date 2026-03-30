@@ -10,41 +10,71 @@ import ProductCard from "@/components/ProductCard";
 export default function ProductDetail() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : null;
+  const product = id ? getProductById(id) : undefined;
 
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "description" | "shipping" | "reviews"
   >("description");
+  const [activeImage, setActiveImage] = useState(
+    product?.image ?? ""
+  );
 
-  if (!id) {
+  if (!id || !product) {
     notFound();
   }
-
-  const product = getProductById(id);
-  if (!product) {
-    notFound();
-  }
+  const galleryImages = [
+    product.image,
+    "/products/headphones.jpg",
+    "/products/keyboard.jpg",
+    "/products/mousepad.jpg",
+  ].filter(
+    (img, index, all) => all.indexOf(img) === index
+  );
 
   const relatedProducts = getProducts().filter(
     (p) => p.id !== product.id
   );
 
   return (
-    <main className="max-w-5xl mx-auto p-8 space-y-16">
+    <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
       {/* Top section */}
       <section className="grid md:grid-cols-2 gap-12">
         {/* Image */}
         <div className="border-4 border-violet-600 rounded-xl overflow-hidden">
           <Image
-            src={product.image}
+            src={activeImage}
             alt={product.title}
             width={500}
             height={500}
             className="object-cover w-full h-full"
             priority
           />
+          <ul className="mt-4 flex gap-3 px-4 pb-4">
+            {galleryImages.map((img) => (
+              <li key={img}>
+                <button
+                  onClick={() => setActiveImage(img)}
+                  className={`h-16 w-16 overflow-hidden rounded-lg border ${
+                    img === activeImage
+                      ? "border-violet-600"
+                      : "border-zinc-200 dark:border-zinc-700"
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={product.title}
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
+
 
         {/* Info */}
         <div>
@@ -132,6 +162,23 @@ export default function ProductDetail() {
           </div>
         </div>
       </section>
+
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-200 bg-white/95 p-4 shadow-lg backdrop-blur md:hidden dark:border-zinc-800 dark:bg-zinc-900/95">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <div>
+            <p className="text-xs text-zinc-500">Total</p>
+            <p className="text-lg font-semibold">
+              ${product.price}
+            </p>
+          </div>
+          <button
+            onClick={() => addToCart(product.id)}
+            className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-700"
+          >
+            Add to cart
+          </button>
+        </div>
+      </div>
 
       {/* Related products */}
       <section>

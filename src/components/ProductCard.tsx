@@ -2,23 +2,27 @@
 
 import Link from "next/link";
 import { Product } from "@/lib/products";
-import Image from "next/image"
+import Image from "next/image";
 
 type Props = {
   product: Product;
 };
-
 export default function ProductCard({ product }: Props) {
   return (
-    <li
-      className="
+    <li className="
         border rounded-lg p-4 bg-white/80 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800
         w-full mb-2 break-inside-avoid
         transition-all duration-300
         hover:shadow-xl hover:scale-[0.98]
         group/card
-      "
-    >
+        relative"
+        >
+
+    {product.discountPercent ? (
+      <span className="absolute right-3 top-3 rounded-full bg-red-600 px-2 py-1 text-xs font-semibold text-white">
+        -{product.discountPercent}%
+      </span>
+    ) : null }
       {/* Link to product detail */}
       <Link href={`/product/${product.id}`} className="block">
       <Image
