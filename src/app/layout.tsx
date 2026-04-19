@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Header from "@/components/Header";;
+import Header from "@/components/Header";
 import { CartProvider } from "@/app/context/CartContext";
 import { OrdersProvider } from "@/app/context/OrdersContext";
 import Footer from "@/components/Footer";

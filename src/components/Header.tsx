@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
+import AccountMenu from "@/components/AccountMenu";
 
 const THEME_KEY = "minishop-theme";
 
@@ -122,6 +123,8 @@ export default function Header() {
           >
             Toggle theme
           </button>
+
+          <AccountMenu />
 
           <Link
             href="/cart"

@@ -1,28 +1,36 @@
 export default function Footer() {
-    return (
-<footer className="w-full border-t py-6 bg-white dark:bg-zinc-900 dark:border-zinc-700">
-    <div className="max-w-7xl mx-auto px-6 relative">
-      <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-600 dark:text-zinc-300">
-        © 2026 MiniShop
-      </span>
-      <div className="flex justify-center gap-4">
+  return (
+    <footer className="site-footer">
+      <div className="footer-inner">
         <a
+          className="footer-link portfolio-link"
           href="https://alejosworkstuff.github.io/portfolio/"
-          className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
-          target="_blank" rel="noopener noreferrer"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Portfolio
         </a>
-        <span className="separator">•</span>
         <a
+          className="social-bubble social-github"
           href="https://github.com/alejosworkstuff"
-          className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
-          target="_blank" rel="noopener noreferrer"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub Profile"
+          title="GitHub"
         >
-          GitHub
+          <img src="/assets/icons/github.svg" alt="" className="social-icon" />
+        </a>
+        <a
+          className="social-bubble social-linkedin"
+          href="https://www.linkedin.com/in/alejo-castillo-0b02b73b0/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="LinkedIn Profile"
+          title="LinkedIn"
+        >
+          <img src="/assets/icons/linkedin.svg" alt="" className="social-icon" />
         </a>
       </div>
-    </div>
-</footer>
-    );
+    </footer>
+  );
 }
