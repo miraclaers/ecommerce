@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import { CartProvider } from "@/app/context/CartContext";
 import { OrdersProvider } from "@/app/context/OrdersContext";
+import { RealtimeProvider } from "@/app/context/RealtimeContext";
+import { MessagesProvider } from "@/app/context/MessagesContext";
+import { FavoritesProvider } from "@/app/context/FavoritesContext";
+import { CollectionsProvider } from "@/app/context/CollectionsContext";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 
@@ -41,17 +45,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <CartProvider>
-          <OrdersProvider>
-            <Header />
-            <main className="flex-1">
-              <PageTransition>
-                {children}
-              </PageTransition>
-            </main>
-            <Footer />
-          </OrdersProvider>
-        </CartProvider>
+        <RealtimeProvider>
+          <CartProvider>
+            <OrdersProvider>
+              <FavoritesProvider>
+                <CollectionsProvider>
+                  <MessagesProvider>
+                    <Header />
+                    <main className="flex-1">
+                      <PageTransition>
+                        {children}
+                      </PageTransition>
+                    </main>
+                    <Footer />
+                  </MessagesProvider>
+                </CollectionsProvider>
+              </FavoritesProvider>
+            </OrdersProvider>
+          </CartProvider>
+        </RealtimeProvider>
       </body>
     </html>
   );

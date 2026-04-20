@@ -8,11 +8,8 @@ import {
   useRef,
   ReactNode,
 } from "react";
-
-export type CartItem = {
-  id: string;
-  quantity: number;
-};
+import { fetchRemoteCart, syncRemoteCart } from "@/lib/api-client";
+import type { CartItem } from "@/lib/types";
 
 export type CartContextType = {
   cart: CartItem[];
@@ -31,12 +28,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const hasLoaded = useRef(false);
   const storageKey = "minishop_cart";
+  const sessionStorageKey = "minishop_cart_session";
+  const cartSessionRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const existingSession = localStorage.getItem(sessionStorageKey);
+    const sessionId = existingSession ?? crypto.randomUUID();
+    if (!existingSession) {
+      localStorage.setItem(sessionStorageKey, sessionId);
+    }
+    cartSessionRef.current = sessionId;
+
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) {
-        hasLoaded.current = true;
         return;
       }
       const parsed = JSON.parse(raw);
@@ -55,11 +60,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } finally {
       hasLoaded.current = true;
     }
+
+    fetchRemoteCart(sessionId)
+      .then((remoteItems) => {
+        if (remoteItems.length > 0) {
+          setCart(remoteItems);
+        }
+      })
+      .catch(() => {
+        // Demo mode: keep local cart when API/Redis is unavailable.
+      });
   }, []);
 
   useEffect(() => {
     if (!hasLoaded.current) return;
     localStorage.setItem(storageKey, JSON.stringify(cart));
+    if (!cartSessionRef.current) return;
+    syncRemoteCart(cartSessionRef.current, cart).catch(() => {
+      // Demo mode fallback.
+    });
   }, [cart]);
 
   const addToCart = (id: string) => {

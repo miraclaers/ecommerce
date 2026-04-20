@@ -1,15 +1,27 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
-import { getProductById } from "@/lib/products";
+import { fetchProducts } from "@/lib/api-client";
+import type { Product } from "@/lib/types";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 export default function CheckoutPage() {
   const { cart } = useCart();
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetchProducts().then(setProducts).catch(() => setProducts([]));
+  }, []);
+
+  const productMap = useMemo(
+    () => new Map(products.map((product) => [product.id, product])),
+    [products]
+  );
 
   const items = cart
     .map((item) => {
-      const product = getProductById(item.id);
+      const product = productMap.get(item.id);
       if (!product) return null;
 
       return {

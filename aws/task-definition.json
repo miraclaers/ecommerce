@@ -1,0 +1,49 @@
+{
+  "family": "mini-ecommerce-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "mini-ecommerce",
+      "image": "REPLACE_IN_CI",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "NEXT_PUBLIC_WS_URL",
+          "value": "wss://realtime.example.com"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:123456789012:parameter/minishop/prod/REDIS_URL"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/mini-ecommerce",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

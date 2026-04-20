@@ -1,27 +1,53 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getProducts, Product } from "@/lib/products";
+import { fetchProducts } from "@/lib/api-client";
+import type { Product } from "@/lib/types";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 export default function ProductsPage() {
-  const products: Product[] = getProducts();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const categories = useMemo(
     () => ["All", ...new Set(products.map((p) => p.category))],
     [products]
   );
   const prices = products.map((p) => p.price);
-  const minProductPrice = Math.min(...prices);
-  const maxProductPrice = Math.max(...prices);
+  const minProductPrice = prices.length > 0 ? Math.min(...prices) : 0;
+  const maxProductPrice = prices.length > 0 ? Math.max(...prices) : 0;
 
   const [activeCategory, setActiveCategory] = useState("All");
-  const [minPrice, setMinPrice] = useState(minProductPrice);
-  const [maxPrice, setMaxPrice] = useState(maxProductPrice);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
   const [sortBy, setSortBy] = useState<
     "newest" | "price-low" | "price-high" | "popular"
   >("newest");
   const [showSkeletons, setShowSkeletons] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchProducts()
+      .then((data) => {
+        if (!isMounted) return;
+        setProducts(data);
+        const nextPrices = data.map((item) => item.price);
+        const nextMin =
+          nextPrices.length > 0 ? Math.min(...nextPrices) : 0;
+        const nextMax =
+          nextPrices.length > 0 ? Math.max(...nextPrices) : 0;
+        setMinPrice(nextMin);
+        setMaxPrice(nextMax);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setIsLoadingProducts(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -157,7 +183,7 @@ export default function ProductsPage() {
       </section>
 
       <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
-        {showSkeletons
+        {showSkeletons || isLoadingProducts
           ? Array.from({ length: 8 }).map((_, index) => (
               <ProductCardSkeleton key={`product-skeleton-${index}`} />
             ))

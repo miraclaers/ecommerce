@@ -8,6 +8,11 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useOrders } from "@/app/context/OrdersContext";
+import { useMessages } from "@/app/context/MessagesContext";
+import { useFavorites } from "@/app/context/FavoritesContext";
+import { useCollections } from "@/app/context/CollectionsContext";
 
 type MenuAction =
   | "purchases"
@@ -58,6 +63,11 @@ function MenuIcon({
 }
 
 export default function AccountMenu() {
+  const router = useRouter();
+  const { orders } = useOrders();
+  const { unreadCount } = useMessages();
+  const { favoritesCount } = useFavorites();
+  const { collections } = useCollections();
   const menuId = useId();
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -104,6 +114,26 @@ export default function AccountMenu() {
   }, [open]);
 
   const handleAction = (action: MenuAction) => {
+    if (action === "purchases") {
+      router.push("/my-purchases");
+      setOpen(false);
+      return;
+    }
+    if (action === "messages") {
+      router.push("/messages");
+      setOpen(false);
+      return;
+    }
+    if (action === "favorites") {
+      router.push("/favorites");
+      setOpen(false);
+      return;
+    }
+    if (action === "collections") {
+      router.push("/collections");
+      setOpen(false);
+      return;
+    }
     showToast(DEMO_MESSAGES[action]);
     setOpen(false);
   };
@@ -172,7 +202,14 @@ export default function AccountMenu() {
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
               <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
             </MenuIcon>
-            My purchases
+            <span className="flex items-center gap-2">
+              My purchases
+              {orders.length > 0 ? (
+                <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                  {orders.length}
+                </span>
+              ) : null}
+            </span>
           </button>
           <button
             type="button"
@@ -183,7 +220,14 @@ export default function AccountMenu() {
             <MenuIcon>
               <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
             </MenuIcon>
-            Messages
+            <span className="flex items-center gap-2">
+              Messages
+              {unreadCount > 0 ? (
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                  {unreadCount}
+                </span>
+              ) : null}
+            </span>
           </button>
         </div>
 
@@ -210,7 +254,14 @@ export default function AccountMenu() {
             <MenuIcon>
               <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
             </MenuIcon>
-            Favorites
+            <span className="flex items-center gap-2">
+              Favorites
+              {favoritesCount > 0 ? (
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  {favoritesCount}
+                </span>
+              ) : null}
+            </span>
           </button>
           <button
             type="button"
@@ -221,7 +272,14 @@ export default function AccountMenu() {
             <MenuIcon>
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </MenuIcon>
-            Collections
+            <span className="flex items-center gap-2">
+              Collections
+              {collections.length > 0 ? (
+                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[11px] font-semibold text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                  {collections.length}
+                </span>
+              ) : null}
+            </span>
           </button>
         </div>
 

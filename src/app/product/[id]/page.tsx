@@ -1,26 +1,29 @@
 "use client";
 
 import { notFound, useParams } from "next/navigation";
-import { getProductById, getProducts } from "@/lib/products";
+import { fetchProductById, fetchProducts } from "@/lib/api-client";
 import { useCart } from "@/app/context/CartContext";
+import { useFavorites } from "@/app/context/FavoritesContext";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import ProductDetailSkeleton from "@/components/ProductDetailSkeleton";
+import type { Product } from "@/lib/types";
+import CollectionPicker from "@/components/CollectionPicker";
 
 export default function ProductDetail() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : null;
-  const product = id ? getProductById(id) : undefined;
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(true);
 
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState<
     "description" | "shipping" | "reviews"
   >("description");
-  const [activeImage, setActiveImage] = useState(
-    product?.image ?? ""
-  );
   const [showRelatedSkeletons, setShowRelatedSkeletons] =
     useState(true);
   const [showDetailSkeleton, setShowDetailSkeleton] =
@@ -32,21 +35,30 @@ export default function ProductDetail() {
     null
   );
 
-  if (!id || !product) {
-    notFound();
-  }
-  const galleryImages = [
-    product.image,
-    "/products/headphones.jpg",
-    "/products/keyboard.jpg",
-    "/products/mousepad.jpg",
-  ].filter(
-    (img, index, all) => all.indexOf(img) === index
-  );
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    let isMounted = true;
+    Promise.all([fetchProductById(id), fetchProducts()])
+      .then(([selected, all]) => {
+        if (!isMounted) return;
+        setProduct(selected);
+        setRelatedProducts(all.filter((item) => item.id !== selected.id));
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setProduct(null);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setIsLoadingProduct(false);
+      });
 
-  const relatedProducts = getProducts().filter(
-    (p) => p.id !== product.id
-  );
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,6 +82,19 @@ export default function ProductDetail() {
     };
   }, []);
 
+  if (!id || (!isLoadingProduct && !product)) {
+    notFound();
+  }
+  if (!product) {
+    return (
+      <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
+        <ProductDetailSkeleton />
+      </main>
+    );
+  }
+
+  const activeImage = product.image;
+  const favorite = isFavorite(product.id);
   const handleAddToCart = () => {
     addToCart(product.id);
     setShowToast(true);
@@ -82,7 +107,7 @@ export default function ProductDetail() {
     }, 2000);
   };
 
-  if (showDetailSkeleton) {
+  if (showDetailSkeleton || isLoadingProduct) {
     return (
       <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
         <ProductDetailSkeleton />
@@ -162,12 +187,41 @@ export default function ProductDetail() {
             ${product.price}
           </p>
 
-          <button
-            onClick={handleAddToCart}
-            className="mt-8 bg-violet-600 text-white px-6 py-3 rounded-xl hover:bg-violet-700 transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
-          >
-            Add to cart
-          </button>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleAddToCart}
+              className="bg-violet-600 text-white px-6 py-3 rounded-xl hover:bg-violet-700 transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
+            >
+              Add to cart
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleFavorite(product.id)}
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                favorite
+                  ? "border-amber-300 bg-amber-100 text-amber-700 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                  : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              }`}
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill={favorite ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+              </svg>
+              {favorite ? "Favorited" : "Favorite"}
+            </button>
+            <CollectionPicker
+              productId={product.id}
+              buttonClassName="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-300 bg-indigo-100 px-4 py-3 text-sm font-medium text-indigo-700 transition hover:bg-indigo-200 dark:border-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 dark:hover:bg-indigo-900/60"
+            />
+          </div>
 
           {/* Tabs */}
           <div className="mt-10">

@@ -4,19 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:realtime": "node realtime-server.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "graphql": "^16.13.2",
     "next": "16.0.10",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "redis": "^5.12.1",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",

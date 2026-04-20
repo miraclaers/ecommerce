@@ -4,15 +4,25 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useOrders } from "@/app/context/OrdersContext";
 import { useCart } from "@/app/context/CartContext";
-import { getProductById } from "@/lib/products";
+import { fetchProducts } from "@/lib/api-client";
+import { useState } from "react";
+import type { Product } from "@/lib/types";
+import { useRealtime } from "@/app/context/RealtimeContext";
 
 export default function CheckoutSuccessPage() {
-  const { addOrder } = useOrders();
+  const { addOrder, setOrderPaid } = useOrders();
   const { cart, clearCart } = useCart();
+  const { sendEvent } = useRealtime();
   const hasSubmitted = useRef(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
+  useEffect(() => {
+    fetchProducts().then(setProducts).catch(() => setProducts([]));
+  }, []);
+
+  const productMap = new Map(products.map((product) => [product.id, product]));
   const total = cart.reduce((acc, item) => {
-    const product = getProductById(item.id);
+    const product = productMap.get(item.id);
     if (!product) return acc;
     return acc + product.price * item.quantity;
   }, 0);
@@ -21,16 +31,25 @@ export default function CheckoutSuccessPage() {
     if (hasSubmitted.current) return;
     if (cart.length === 0) return;
 
-    addOrder({
-      id: crypto.randomUUID(),
-      total,
-      date: new Date().toISOString(),
-      items: cart,
-    });
-
-    clearCart();
-    hasSubmitted.current = true;
-  }, [addOrder, clearCart, total, cart]);
+    addOrder({ total, items: cart })
+      .then(async (created) => {
+        await setOrderPaid(created.id);
+        sendEvent({
+          type: "order.status.paid",
+          payload: {
+            orderId: created.id,
+            total: created.total,
+          },
+        });
+      })
+      .catch(() => {
+        // Keep UX smooth in demo mode if API is unavailable.
+      })
+      .finally(() => {
+        clearCart();
+        hasSubmitted.current = true;
+      });
+  }, [addOrder, clearCart, total, cart, setOrderPaid, sendEvent]);
 
   return (
     <main className="p-8 max-w-lg mx-auto">

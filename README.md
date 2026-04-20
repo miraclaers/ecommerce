@@ -1,69 +1,67 @@
 # Mini Ecommerce (Next.js)
 
-Mini Ecommerce is a demo store built with Next.js App Router, TypeScript, and React Context.
-The focus is on clean architecture, cart behavior, and a complete fake checkout flow.
+Mini Ecommerce is a learning-focused full-stack demo built with Next.js App Router.  
+It now includes REST + GraphQL APIs, Redis cache/session patterns, realtime updates with WebSockets, Docker local stack, and AWS ECS deployment scaffolding.
 
 Live URL: `https://mini-ecommerce-nextjs-psi.vercel.app`
 
 ## Features
 
-- Home page with demo intro and CTA
-- Product listing page
-- Product detail page by ID
-- Cart management
-- Add, remove, and update quantities
-- Fake checkout flow (`/checkout/pay`, `/checkout/success`, `/checkout/error`)
-- Global state via Context API (cart and orders)
-- Basic metadata setup for Open Graph and Twitter cards
+- Product listing and product detail pages fetched via API routes
+- Cart and checkout flow with order creation and status updates
+- REST API routes (`/api/products`, `/api/orders`, `/api/cart/[sessionId]`)
+- GraphQL endpoint (`/api/graphql`) for order creation and product queries
+- Redis-backed product caching and cart session sync (with local-memory fallback)
+- Realtime order-status notifications via WebSocket provider and gateway
+- CI quality checks (lint/build) and AWS ECS deploy workflow
 
 ## Tech Stack
 
-- Next.js (App Router)
-- React
-- TypeScript
-- Tailwind CSS
-- Context API
-- Fake local product data (`src/lib/products.ts`)
+- Next.js (App Router), React, TypeScript, Tailwind CSS
+- Node.js route handlers (REST + GraphQL)
+- Redis (`redis` package) for caching/session patterns
+- WebSocket gateway (`ws`)
+- Docker + Docker Compose
+- GitHub Actions + AWS ECS deployment template
 
-## Screenshots
+## Local Development
 
-Add one screenshot per page route and place all files in `public/screenshots/`:
-
-- `home.png` (`/`)
-- `products.png` (`/products`)
-- `product-detail.png` (`/product/[id]`)
-- `cart.png` (`/cart`)
-- `checkout.png` (`/checkout`)
-- `checkout-pay.png` (`/checkout/pay`)
-- `checkout-success.png` (`/checkout/success`)
-- `checkout-error.png` (`/checkout/error`)
-
-![Home](./public/screenshots/home.png)
-![Products](./public/screenshots/products.png)
-![Product Detail](./public/screenshots/product-detail.png)
-![Cart](./public/screenshots/cart.png)
-![Checkout](./public/screenshots/checkout.png)
-![Checkout Pay](./public/screenshots/checkout-pay.png)
-![Checkout Success](./public/screenshots/checkout-success.png)
-![Checkout Error](./public/screenshots/checkout-error.png)
-## Run Locally
+### App only
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open: `http://localhost:3000`
+### Full local stack (app + Redis + realtime gateway)
 
-## Project Structure (Key Files)
+```bash
+docker compose up --build
+```
 
-- `src/app/page.tsx` - Home page
-- `src/app/products/page.tsx` - Product listing
-- `src/app/product/[id]/page.tsx` - Product detail
-- `src/app/cart/page.tsx` - Cart page
-- `src/app/checkout/*` - Checkout steps
-- `src/app/layout.tsx` - App layout and metadata
-- `src/lib/products.ts` - Product data source
-- `src/app/context/CartContext.tsx` - Cart global state
-- `src/app/context/OrdersContext.tsx` - Orders global state
+Required env values are documented in `.env.example`.
+
+## API Surface
+
+- `GET /api/products` and `GET /api/products/[id]`
+- `GET|POST|PATCH /api/orders`
+- `GET|PUT /api/cart/[sessionId]`
+- `POST /api/graphql`
+
+## Realtime Gateway
+
+Start local gateway:
+
+```bash
+npm run dev:realtime
+```
+
+Default URL: `ws://localhost:4001` (`NEXT_PUBLIC_WS_URL`)
+
+## Deployment Notes
+
+- CI workflow: `.github/workflows/ci.yml`
+- AWS ECS workflow: `.github/workflows/deploy-aws.yml`
+- Task definition template: `aws/task-definition.json`
+- Deployment notes: `aws/deploy.md`
 

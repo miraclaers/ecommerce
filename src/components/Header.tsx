@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
 import AccountMenu from "@/components/AccountMenu";
 
@@ -12,11 +12,6 @@ export default function Header() {
   const itemCount = cart.reduce(
     (total, item) => total + item.quantity,
     0
-  );
-  const [animateBadge, setAnimateBadge] = useState(false);
-  const previousCount = useRef(itemCount);
-  const badgeTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null
   );
 
   useEffect(() => {
@@ -36,26 +31,6 @@ export default function Header() {
       nextTheme === "dark"
     );
   }, []);
-
-  useEffect(() => {
-    if (itemCount > previousCount.current) {
-      setAnimateBadge(true);
-      if (badgeTimer.current) {
-        clearTimeout(badgeTimer.current);
-      }
-      badgeTimer.current = setTimeout(() => {
-        setAnimateBadge(false);
-      }, 320);
-    }
-
-    previousCount.current = itemCount;
-
-    return () => {
-      if (badgeTimer.current) {
-        clearTimeout(badgeTimer.current);
-      }
-    };
-  }, [itemCount]);
 
   const toggleTheme = () => {
     const isDark =
@@ -147,9 +122,8 @@ export default function Header() {
             </svg>
             {itemCount > 0 ? (
               <span
-                className={`absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[11px] font-semibold text-white ${
-                  animateBadge ? "cart-badge-pop" : ""
-                }`}
+                key={itemCount}
+                className="cart-badge-pop absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[11px] font-semibold text-white"
               >
                 {itemCount}
               </span>

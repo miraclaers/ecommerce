@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../context/CartContext";
-import { getProductById, getProducts } from "@/lib/products";
+import { fetchProducts } from "@/lib/api-client";
+import type { Product } from "@/lib/types";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import { useRealtime } from "@/app/context/RealtimeContext";
 
 export default function CartPage() {
   const {
@@ -15,10 +17,31 @@ export default function CartPage() {
     decreaseQuantity,
     clearCart,
   } = useCart();
+  const { latestEvent, isConnected } = useRealtime();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchProducts()
+      .then((data) => {
+        if (!isMounted) return;
+        setProducts(data);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setIsLoadingProducts(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const productMap = new Map(products.map((product) => [product.id, product]));
 
   const cartItemsWithData = cart
     .map((item) => {
-      const product = getProductById(item.id);
+      const product = productMap.get(item.id);
       if (!product) return null;
 
       return {
@@ -29,7 +52,7 @@ export default function CartPage() {
     })
     .filter(Boolean);
 
-  const suggestedProducts = getProducts().slice(0, 3);
+  const suggestedProducts = products.slice(0, 3);
   const [showSuggestionSkeletons, setShowSuggestionSkeletons] =
     useState(true);
 
@@ -39,6 +62,16 @@ export default function CartPage() {
     }, 350);
     return () => clearTimeout(timer);
   }, []);
+
+  const realtimeMessage = useMemo(() => {
+    if (latestEvent?.type !== "order.status.paid") {
+      return null;
+    }
+    const orderId = String(latestEvent.payload.orderId ?? "");
+    return orderId
+      ? `Order ${orderId.slice(0, 8)} marked as paid in real time.`
+      : "An order status was updated in real time.";
+  }, [latestEvent]);
 
   const total = cartItemsWithData.reduce(
     (acc, item) => acc + item!.subtotal,
@@ -50,6 +83,14 @@ export default function CartPage() {
       <h1 className="text-2xl font-bold mb-6">
         Cart
       </h1>
+      <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+        Realtime gateway: {isConnected ? "connected" : "offline"}
+      </p>
+      {realtimeMessage ? (
+        <div className="mb-6 rounded-lg border border-emerald-300/60 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-300">
+          {realtimeMessage}
+        </div>
+      ) : null}
 
       {cartItemsWithData.length === 0 ? (
         <>
@@ -98,7 +139,7 @@ export default function CartPage() {
               Products you might be interested in
             </h2>
             <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
-              {showSuggestionSkeletons
+              {showSuggestionSkeletons || isLoadingProducts
                 ? Array.from({ length: 3 }).map((_, index) => (
                     <ProductCardSkeleton
                       key={`suggestion-skeleton-${index}`}
