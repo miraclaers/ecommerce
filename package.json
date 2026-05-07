@@ -7,7 +7,9 @@
     "dev:realtime": "node realtime-server.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "ci": "npm run lint && npm run type-check && npm run build"
   },
   "dependencies": {
     "graphql": "^16.13.2",

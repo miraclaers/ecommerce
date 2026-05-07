@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  lint-and-build:
+  quality-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -24,6 +24,9 @@ jobs:
 
       - name: Run lint
         run: npm run lint
+
+      - name: Run type-check
+        run: npm run type-check
 
       - name: Build app
         run: npm run build
