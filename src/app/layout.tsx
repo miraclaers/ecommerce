@@ -11,6 +11,11 @@ import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://mini-ecommerce-nextjs-psi.vercel.app"),
   title: "MiniShop - Demo E-commerce App",

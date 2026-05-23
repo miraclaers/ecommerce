@@ -17,7 +17,7 @@ export default function CheckoutStepper({
   );
 
   return (
-    <ol className="mb-8 flex items-center gap-2 text-sm">
+    <ol className="mb-8 flex flex-wrap items-center justify-center gap-2 text-sm sm:justify-start">
       {steps.map((step, index) => {
         const isComplete = index < currentIndex;
         const isActive = index === currentIndex;

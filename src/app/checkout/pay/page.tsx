@@ -16,8 +16,8 @@ export default function PayPage() {
   };
 
   return (
-    <main className="p-8 max-w-lg mx-auto">
-      <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm text-center">
+    <main className="mx-auto max-w-lg p-4 sm:p-8">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
           <svg
             aria-hidden="true"

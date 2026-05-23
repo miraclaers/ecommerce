@@ -62,7 +62,7 @@ export default function FavoritesPage() {
         {favorites.length} saved {favorites.length === 1 ? "product" : "products"}.
       </p>
 
-      <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+      <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
         {isLoading
           ? Array.from({ length: 6 }).map((_, index) => (
               <ProductCardSkeleton key={`favorite-skeleton-${index}`} />

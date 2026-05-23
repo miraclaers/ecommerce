@@ -16,6 +16,7 @@ export default function MessagesPage() {
   const { threads, sendMessage, markThreadAsRead } = useMessages();
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const [showInbox, setShowInbox] = useState(true);
 
   const sortedThreads = useMemo(() => {
     return [...threads].sort((a, b) => {
@@ -31,6 +32,18 @@ export default function MessagesPage() {
     null;
 
   useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px)");
+    const syncLayout = () => {
+      if (media.matches) {
+        setShowInbox(true);
+      }
+    };
+    syncLayout();
+    media.addEventListener("change", syncLayout);
+    return () => media.removeEventListener("change", syncLayout);
+  }, []);
+
+  useEffect(() => {
     if (!selectedThread) return;
     markThreadAsRead(selectedThread.id);
   }, [selectedThread, markThreadAsRead]);
@@ -38,6 +51,13 @@ export default function MessagesPage() {
   const handleSelectThread = (threadId: string) => {
     setSelectedThreadId(threadId);
     markThreadAsRead(threadId);
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      setShowInbox(false);
+    }
+  };
+
+  const handleBackToInbox = () => {
+    setShowInbox(true);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -48,7 +68,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-6xl p-6">
+    <main className="mx-auto w-full max-w-6xl p-4 sm:p-6">
       <h1 className="mb-1 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         Messages
       </h1>
@@ -56,12 +76,16 @@ export default function MessagesPage() {
         Mock inbox with local storage persistence.
       </p>
 
-      <section className="grid min-h-[560px] grid-cols-1 gap-4 rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 md:grid-cols-[300px,1fr]">
-        <aside className="rounded-xl border border-zinc-200 dark:border-zinc-800">
+      <section className="grid min-h-[min(560px,70vh)] grid-cols-1 gap-4 rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 md:min-h-[560px] md:grid-cols-[300px,1fr]">
+        <aside
+          className={`rounded-xl border border-zinc-200 dark:border-zinc-800 ${
+            showInbox ? "block" : "hidden md:block"
+          }`}
+        >
           <div className="border-b border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-700 dark:border-zinc-800 dark:text-zinc-200">
             Inbox
           </div>
-          <ul className="max-h-[520px] overflow-y-auto">
+          <ul className="max-h-[min(520px,55vh)] overflow-y-auto md:max-h-[520px]">
             {sortedThreads.map((thread) => {
               const lastMessage = thread.messages[thread.messages.length - 1];
               const unread = thread.messages.filter(
@@ -102,16 +126,29 @@ export default function MessagesPage() {
           </ul>
         </aside>
 
-        <div className="flex min-h-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800">
+        <div
+          className={`flex min-h-[min(420px,60vh)] flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 ${
+            showInbox ? "hidden md:flex" : "flex"
+          }`}
+        >
           {selectedThread ? (
             <>
-              <header className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-                <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-                  {selectedThread.name}
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {selectedThread.role}
-                </p>
+              <header className="flex items-center gap-3 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={handleBackToInbox}
+                  className="rounded-lg border border-zinc-300 px-2.5 py-1 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 md:hidden dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  Back
+                </button>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+                    {selectedThread.name}
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {selectedThread.role}
+                  </p>
+                </div>
               </header>
 
               <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">

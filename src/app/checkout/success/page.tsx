@@ -81,7 +81,7 @@ export default function CheckoutSuccessPage() {
           </p>
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-3">
+        <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <Link
             href="/products"
             className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition"

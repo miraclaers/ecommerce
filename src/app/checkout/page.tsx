@@ -63,7 +63,7 @@ export default function CheckoutPage() {
           <p className="mt-2 text-gray-600 dark:text-zinc-300">
             Add items before checking out.
           </p>
-          <div className="mt-6 flex items-center justify-center gap-3">
+          <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
             <Link
               href="/products"
               className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition"
@@ -106,12 +106,12 @@ export default function CheckoutPage() {
         ))}
       </ul>
 
-      <div className="mt-6 flex justify-between items-center">
-        <p className="text-xl font-bold">Total: ${total}</p>
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-center text-xl font-bold sm:text-left">Total: ${total}</p>
 
         <Link
           href="/checkout/pay"
-          className="bg-violet-600 text-white px-6 py-3 rounded-lg hover:bg-violet-700"
+          className="w-full rounded-lg bg-violet-600 px-6 py-3 text-center text-white hover:bg-violet-700 sm:w-auto"
         >
           Pay now
         </Link>

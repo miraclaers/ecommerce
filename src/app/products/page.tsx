@@ -89,7 +89,7 @@ export default function ProductsPage() {
   }, [activeCategory, maxPrice, minPrice, products, sortBy]);
 
   return (
-    <main className="p-8">
+    <main className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">Products</h1>
 
       <section className="mb-8 rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
@@ -182,7 +182,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+      <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
         {showSkeletons || isLoadingProducts
           ? Array.from({ length: 8 }).map((_, index) => (
               <ProductCardSkeleton key={`product-skeleton-${index}`} />

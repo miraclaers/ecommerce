@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="max-w-5xl mx-auto px-8 py-20 text-center">
+    <main className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-8 sm:py-20">
       <h1 className="text-4xl font-bold">
         Mini Ecommerce
       </h1>

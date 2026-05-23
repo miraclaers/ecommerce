@@ -79,7 +79,7 @@ export default function CartPage() {
   );
 
   return (
-    <main className="p-8 max-w-4xl mx-auto">
+    <main className="mx-auto max-w-4xl p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">
         Cart
       </h1>
@@ -138,7 +138,7 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold mb-6">
               Products you might be interested in
             </h2>
-            <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+            <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
               {showSuggestionSkeletons || isLoadingProducts
                 ? Array.from({ length: 3 }).map((_, index) => (
                     <ProductCardSkeleton
@@ -157,7 +157,7 @@ export default function CartPage() {
             {cartItemsWithData.map((item) => (
               <li
                 key={item!.id}
-                className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 flex gap-5 items-start bg-white/70 dark:bg-zinc-900/60"
+                className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white/70 p-5 sm:flex-row sm:items-start sm:gap-5 dark:border-zinc-800 dark:bg-zinc-900/60"
               >
                 {/* Image placeholder */}
                 <Image
@@ -179,7 +179,7 @@ export default function CartPage() {
                   </p>
 
                   {/* Quantity & actions */}
-                  <div className="mt-4 flex items-center gap-4">
+                  <div className="mt-4 flex flex-wrap items-center gap-3 sm:gap-4">
                     <span className="font-semibold">
                       Quantity: {item!.quantity}
                     </span>
@@ -221,11 +221,11 @@ export default function CartPage() {
           </ul>
 
           {/* Footer */}
-          <div className="mt-8 flex justify-between items-center">
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <button
               onClick={clearCart}
               className="
-                px-4 py-2
+                w-full px-4 py-2
                 border border-red-300
                 text-red-600
                 rounded-lg
@@ -233,22 +233,24 @@ export default function CartPage() {
                 hover:border-red-400
                 dark:border-red-500/50 dark:text-red-400 dark:hover:bg-red-900/20
                 transition
+                sm:w-auto
               "
             >
               Clear cart
             </button>
 
-            <p className="text-xl font-bold">
+            <p className="text-center text-xl font-bold sm:text-left">
               Total: ${total}
             </p>
             <Link
               href="/checkout"
               className="
-                px-6 py-3
+                w-full px-6 py-3 text-center
                 bg-violet-600 text-white
                 rounded-lg
                 hover:bg-violet-700
                 transition
+                sm:w-auto
               "
             >
               Proceed to checkout

@@ -67,6 +67,8 @@ GitHub Actions CI runs on pull requests and pushes to `main` with:
 - type-check (`npm run type-check`)
 - production build (`npm run build`)
 
+Note: the CI workflow is fully configured. If GitHub Actions appears as "not started," it may be due to temporary account billing restrictions on hosted runners; the same checks still run locally via `npm run ci`.
+
 Run locally:
 
 ```bash

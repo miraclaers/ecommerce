@@ -127,7 +127,7 @@ export default function CollectionsPage() {
                           setMessage(null);
                         }
                       }}
-                      className="flex items-center gap-2"
+                      className="flex flex-col gap-2 sm:flex-row sm:items-center"
                     >
                       <input
                         type="text"
@@ -214,7 +214,7 @@ export default function CollectionsPage() {
                     collectionProducts.map((product) => (
                       <li
                         key={`${collection.id}-${product.id}`}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-zinc-100 px-3 py-2 dark:border-zinc-800"
+                        className="flex flex-col gap-3 rounded-lg border border-zinc-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800"
                       >
                         <div>
                           <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">

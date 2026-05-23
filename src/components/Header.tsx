@@ -46,10 +46,10 @@ export default function Header() {
 
   return (
     <header className="w-full border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-6">
+      <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-0">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-sm font-semibold uppercase text-white dark:bg-zinc-100 dark:text-zinc-900">
             MS
@@ -57,7 +57,7 @@ export default function Header() {
           MiniShop
         </Link>
 
-        <form className="relative flex-1">
+        <form className="relative order-3 w-full min-w-0 sm:order-none sm:flex-1">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
             <svg
               aria-hidden="true"
@@ -82,7 +82,7 @@ export default function Header() {
           />
         </form>
 
-        <div className="flex items-center gap-3 text-sm font-medium text-zinc-600 dark:text-zinc-300">
+        <div className="order-2 ml-auto flex shrink-0 items-center gap-2 text-sm font-medium text-zinc-600 sm:order-none sm:gap-3 dark:text-zinc-300">
           <Link
             href="/products"
             className="hidden text-sm transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 sm:inline"
@@ -93,17 +93,20 @@ export default function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-xs text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:px-3"
             aria-label="Toggle theme"
           >
-            Toggle theme
+            <span className="sm:hidden" aria-hidden="true">
+              Theme
+            </span>
+            <span className="hidden sm:inline">Toggle theme</span>
           </button>
 
           <AccountMenu />
 
           <Link
             href="/cart"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
             aria-label="Open cart"
           >
             <svg

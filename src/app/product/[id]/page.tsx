@@ -87,7 +87,7 @@ export default function ProductDetail() {
   }
   if (!product) {
     return (
-      <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
+      <main className="mx-auto max-w-5xl space-y-16 p-4 pb-24 sm:p-8">
         <ProductDetailSkeleton />
       </main>
     );
@@ -109,14 +109,14 @@ export default function ProductDetail() {
 
   if (showDetailSkeleton || isLoadingProduct) {
     return (
-      <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
+      <main className="mx-auto max-w-5xl space-y-16 p-4 pb-24 sm:p-8">
         <ProductDetailSkeleton />
 
         <section>
           <h2 className="text-2xl font-bold mb-6">
             Related products
           </h2>
-          <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+          <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
             {Array.from({ length: 3 }).map((_, index) => (
               <ProductCardSkeleton
                 key={`related-skeleton-${index}`}
@@ -225,7 +225,7 @@ export default function ProductDetail() {
 
           {/* Tabs */}
           <div className="mt-10">
-            <div className="flex gap-6 border-b border-zinc-200 dark:border-zinc-800">
+            <div className="-mx-1 flex gap-4 overflow-x-auto border-b border-zinc-200 px-1 sm:gap-6 dark:border-zinc-800">
               {["description", "shipping", "reviews"].map(
                 (tab) => (
                   <button
@@ -235,7 +235,7 @@ export default function ProductDetail() {
                         tab as typeof activeTab
                       )
                     }
-                    className={`pb-2 capitalize ${
+                    className={`shrink-0 pb-2 capitalize ${
                       activeTab === tab
                         ? "border-b-2 border-violet-600 font-semibold"
                         : "text-gray-500 dark:text-zinc-400"
@@ -397,7 +397,7 @@ export default function ProductDetail() {
           Related products
         </h2>
 
-        <ul className="columns-[12rem] sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem] gap-x-4">
+        <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
           {showRelatedSkeletons
             ? Array.from({ length: 3 }).map((_, index) => (
                 <ProductCardSkeleton
