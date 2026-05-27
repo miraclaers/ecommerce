@@ -134,6 +134,11 @@ export default function AccountMenu() {
       setOpen(false);
       return;
     }
+    if (action === "settings") {
+      router.push("/settings");
+      setOpen(false);
+      return;
+    }
     showToast(DEMO_MESSAGES[action]);
     setOpen(false);
   };

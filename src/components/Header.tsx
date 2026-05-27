@@ -32,18 +32,6 @@ export default function Header() {
     );
   }, []);
 
-  const toggleTheme = () => {
-    const isDark =
-      document.documentElement.classList.contains("dark");
-    const nextTheme = isDark ? "light" : "dark";
-
-    document.documentElement.classList.toggle(
-      "dark",
-      nextTheme === "dark"
-    );
-    window.localStorage.setItem(THEME_KEY, nextTheme);
-  };
-
   return (
     <header className="w-full border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-0">
@@ -89,18 +77,6 @@ export default function Header() {
           >
             Products
           </Link>
-
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-xs text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:px-3"
-            aria-label="Toggle theme"
-          >
-            <span className="sm:hidden" aria-hidden="true">
-              Theme
-            </span>
-            <span className="hidden sm:inline">Toggle theme</span>
-          </button>
 
           <AccountMenu />
 

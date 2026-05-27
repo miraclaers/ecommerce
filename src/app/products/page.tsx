@@ -93,7 +93,7 @@ export default function ProductsPage() {
       <h1 className="text-2xl font-bold mb-6">Products</h1>
 
       <section className="mb-8 rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
               Categories
@@ -119,12 +119,17 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between lg:justify-end">
-            <div>
-              <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                Price range
-              </p>
-              <div className="mt-2 flex items-center gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4 lg:justify-end">
+            <div className="flex flex-col justify-end">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                  Price range
+                </p>
+                <p className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-semibold tabular-nums text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                  ${Math.min(minPrice, maxPrice)} - ${Math.max(minPrice, maxPrice)}
+                </p>
+              </div>
+              <div className="mt-2 flex items-center gap-2.5">
                 <input
                   type="number"
                   min={minProductPrice}
@@ -133,10 +138,10 @@ export default function ProductsPage() {
                   onChange={(event) =>
                     setMinPrice(Number(event.target.value))
                   }
-                  className="w-24 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                  className="h-10 w-28 rounded-lg border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
                   aria-label="Minimum price"
                 />
-                <span className="text-zinc-400">to</span>
+                <span className="text-sm text-zinc-400">to</span>
                 <input
                   type="number"
                   min={minProductPrice}
@@ -145,17 +150,13 @@ export default function ProductsPage() {
                   onChange={(event) =>
                     setMaxPrice(Number(event.target.value))
                   }
-                  className="w-24 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                  className="h-10 w-28 rounded-lg border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
                   aria-label="Maximum price"
                 />
               </div>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                ${Math.min(minPrice, maxPrice)} - $
-                {Math.max(minPrice, maxPrice)}
-              </p>
             </div>
 
-            <div>
+            <div className="flex min-w-[11rem] flex-col justify-end">
               <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
                 Sort by
               </label>
@@ -170,7 +171,7 @@ export default function ProductsPage() {
                       | "popular"
                   )
                 }
-                className="mt-2 w-44 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                className="mt-2 h-10 w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
               >
                 <option value="newest">Newest</option>
                 <option value="price-low">Price (low to high)</option>
