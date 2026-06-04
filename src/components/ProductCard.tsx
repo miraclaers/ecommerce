@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/types";
 import Image from "next/image";
@@ -9,7 +10,8 @@ import CollectionPicker from "@/components/CollectionPicker";
 type Props = {
   product: Product;
 };
-export default function ProductCard({ product }: Props) {
+
+function ProductCard({ product }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
 
@@ -95,3 +97,5 @@ export default function ProductCard({ product }: Props) {
     </li>
   );
 }
+
+export default memo(ProductCard);

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useOrders } from "@/app/context/OrdersContext";
 import { fetchProducts } from "@/lib/api-client";
+import ApiStatusBanner from "@/components/ApiStatusBanner";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 import type { Product } from "@/lib/types";
 
 function formatCurrency(amount: number) {
@@ -23,16 +25,13 @@ function formatDate(date: string) {
 
 export default function MyPurchasesPage() {
   const { orders } = useOrders();
-  const [products, setProducts] = useState<Product[]>([]);
+  const productsState = useAsyncResource(fetchProducts, []);
 
-  useEffect(() => {
-    fetchProducts().then(setProducts).catch(() => setProducts([]));
-  }, []);
-
-  const productMap = useMemo(
-    () => new Map(products.map((product) => [product.id, product])),
-    [products]
-  );
+  const productMap = useMemo(() => {
+    const products: Product[] =
+      productsState.status === "success" ? productsState.data : [];
+    return new Map(products.map((product) => [product.id, product]));
+  }, [productsState]);
 
   if (orders.length === 0) {
     return (
@@ -64,6 +63,14 @@ export default function MyPurchasesPage() {
         {orders.length} {orders.length === 1 ? "order" : "orders"} remembered on
         this device.
       </p>
+
+      <ApiStatusBanner
+        state={productsState}
+        onRetry={
+          productsState.status === "error" ? productsState.reload : undefined
+        }
+        className="mb-6"
+      />
 
       <ul className="space-y-4">
         {orders.map((order) => (

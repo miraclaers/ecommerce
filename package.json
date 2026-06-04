@@ -11,9 +11,13 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ci": "npm run lint && npm run type-check && npm run test && npm run build"
+    "test:e2e": "playwright test",
+    "ci": "npm run lint && npm run type-check && npm run test && npm run build",
+    "ci:full": "npm run ci && npm run test:e2e"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.4.3",
+    "@sentry/nextjs": "^10.56.0",
     "graphql": "^16.13.2",
     "next": "16.0.10",
     "react": "19.2.1",
@@ -22,6 +26,7 @@
     "ws": "^8.20.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",

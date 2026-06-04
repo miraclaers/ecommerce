@@ -18,6 +18,7 @@ export type CartItem = {
 
 export interface Order {
   id: string;
+  userId: string;
   total: number;
   date: string;
   items: CartItem[];
@@ -28,6 +29,8 @@ export type OrderDraft = {
   total: number;
   items: CartItem[];
 };
+
+export type UserRole = "user" | "admin";
 
 export interface ChatMessage {
   id: string;

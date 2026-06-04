@@ -1,6 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/Header";
+import ClerkAuthBridge from "@/components/ClerkAuthBridge";
 import { CartProvider } from "@/app/context/CartContext";
 import { OrdersProvider } from "@/app/context/OrdersContext";
 import { RealtimeProvider } from "@/app/context/RealtimeContext";
@@ -50,25 +52,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <RealtimeProvider>
-          <CartProvider>
-            <OrdersProvider>
-              <FavoritesProvider>
-                <CollectionsProvider>
-                  <MessagesProvider>
-                    <Header />
-                    <main className="flex-1">
-                      <PageTransition>
-                        {children}
-                      </PageTransition>
-                    </main>
-                    <Footer />
-                  </MessagesProvider>
-                </CollectionsProvider>
-              </FavoritesProvider>
-            </OrdersProvider>
-          </CartProvider>
-        </RealtimeProvider>
+        <ClerkProvider>
+          <ClerkAuthBridge />
+          <RealtimeProvider>
+            <CartProvider>
+              <OrdersProvider>
+                <FavoritesProvider>
+                  <CollectionsProvider>
+                    <MessagesProvider>
+                      <Header />
+                      <main className="flex-1">
+                        <PageTransition>{children}</PageTransition>
+                      </main>
+                      <Footer />
+                    </MessagesProvider>
+                  </CollectionsProvider>
+                </FavoritesProvider>
+              </OrdersProvider>
+            </CartProvider>
+          </RealtimeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

@@ -201,10 +201,51 @@ Services: **web** (port 3000), **redis** (6379), **realtime** (4001).
 - **Approach:** Separate UI contexts from API routes; layer Redis caching and realtime updates incrementally.
 - **Result:** A demo that shows product UX plus production-oriented patterns (tests, CI, containers, optional cloud deploy).
 
+## Authentication (Clerk)
+
+- OIDC session via Clerk (`@clerk/nextjs`) with `clerkMiddleware()` in `src/proxy.ts`
+- UI: `<Show>`, `<SignInButton>`, `<SignUpButton>`, `<UserButton>` in the header account area
+- Protected routes: `/my-purchases`, `/messages`, `/collections`, `/settings`, `/admin/*`
+- Orders API scoped by authenticated `userId`
+- Admin panel: `/admin/orders` (requires `publicMetadata.role: "admin"` in Clerk)
+
+Copy `.env.example` → `.env.local` and set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
+
+## HTTP client and API resilience
+
+- Central `http-client` with timeout (`AbortController`), retry on 429/502/503, and typed `AppError`
+- Discriminated union `ApiState<T>` for loading/success/error UI
+- See `src/lib/http-client.ts`, `src/lib/api-state.ts`
+
+## Rendering strategy
+
+Documented in [`docs/frontend-architecture.md`](docs/frontend-architecture.md): SSG/ISR product pages, server-loaded catalog, client cart/checkout.
+
+## Observability
+
+- Sentry (`@sentry/nextjs`) when `NEXT_PUBLIC_SENTRY_DSN` is set
+- App Router `error.tsx` / `global-error.tsx` and `ErrorBoundary` for client islands
+- Structured JSON logs in API routes (`src/lib/logger.ts`)
+
+### Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Redirect loop on account pages | Clerk keys in `.env.local`; sign-in URLs `/sign-in`, `/sign-up` |
+| Orders empty after login | Sign in before checkout; orders are per Clerk `userId` |
+| API timeout errors | Network tab; default 8s timeout in `http-client` |
+| Build fails on Vercel | Add Clerk + optional Sentry env vars in project settings |
+| Sentry not receiving events | `NEXT_PUBLIC_SENTRY_DSN` set; reproduce error and check digest in UI |
+
+## Engineering docs
+
+- [`docs/frontend-architecture.md`](docs/frontend-architecture.md)
+- [`docs/definition-of-done.md`](docs/definition-of-done.md)
+- [`docs/testing-strategy.md`](docs/testing-strategy.md)
+- PR template: `.github/pull_request_template.md`
+
 ## What I Would Improve Next
 
-- Expand test coverage (checkout path, API routes, GraphQL resolvers)
-- Stricter API validation and typed error contracts
-- E2E tests for the critical purchase flow
-- Metrics/observability for API and realtime channels
 - Performance budgets and accessibility audits
+- Redis persistence for orders in multi-instance deploys
+- Preview deployments with required CI checks (when GitHub billing is active)

@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { graphql, buildSchema } from "graphql";
 import { listProducts, readProductById } from "@/lib/product-data";
 import { createOrder, listOrders } from "@/lib/order-store";
@@ -46,23 +47,6 @@ const schema = buildSchema(`
   }
 `);
 
-const rootValue = {
-  products: () => listProducts(),
-  product: ({ id }: { id: string }) => readProductById(id),
-  orders: () => listOrders(),
-  createOrder: ({
-    total,
-    items,
-  }: {
-    total: number;
-    items: CartItem[];
-  }) =>
-    createOrder({
-      total,
-      items,
-    }),
-};
-
 export async function POST(request: Request) {
   const body = (await request.json()) as {
     query?: string;
@@ -75,6 +59,26 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  const { userId } = await auth();
+
+  const rootValue = {
+    products: () => listProducts(),
+    product: ({ id }: { id: string }) => readProductById(id),
+    orders: () => (userId ? listOrders(userId) : []),
+    createOrder: ({
+      total,
+      items,
+    }: {
+      total: number;
+      items: CartItem[];
+    }) => {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      return createOrder(userId, { total, items });
+    },
+  };
 
   const result = await graphql({
     schema,

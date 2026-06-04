@@ -73,6 +73,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     } catch {
       created = {
         id: crypto.randomUUID(),
+        userId: "local",
         total: order.total,
         items: order.items,
         date: new Date().toISOString(),

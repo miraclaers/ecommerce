@@ -1,68 +1,48 @@
 import type { CartItem, Order, OrderDraft, Product } from "@/lib/types";
+import { AppError } from "@/lib/errors";
+import { request } from "@/lib/http-client";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
-async function readJson<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const payload = await response.json().catch(() => ({}));
-    const message =
-      typeof payload.error === "string"
-        ? payload.error
-        : `Request failed: ${response.status}`;
-    throw new Error(message);
-  }
-  return response.json() as Promise<T>;
-}
-
 export async function fetchProducts(): Promise<Product[]> {
-  const response = await fetch(`${baseUrl}/api/products`);
-  const payload = await readJson<{ data: Product[] }>(response);
+  const payload = await request<{ data: Product[] }>(`${baseUrl}/api/products`);
   return payload.data;
 }
 
 export async function fetchProductById(id: string): Promise<Product> {
-  const response = await fetch(`${baseUrl}/api/products/${id}`);
-  const payload = await readJson<{ data: Product }>(response);
+  const payload = await request<{ data: Product }>(
+    `${baseUrl}/api/products/${id}`
+  );
   return payload.data;
 }
 
 export async function fetchOrders(): Promise<Order[]> {
-  const response = await fetch(`${baseUrl}/api/orders`);
-  const payload = await readJson<{ data: Order[] }>(response);
+  const payload = await request<{ data: Order[] }>(`${baseUrl}/api/orders`);
   return payload.data;
 }
 
 export async function postOrder(order: OrderDraft): Promise<Order> {
-  const response = await fetch(`${baseUrl}/api/orders`, {
+  const payload = await request<{ data: Order }>(`${baseUrl}/api/orders`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(order),
+    body: order,
   });
-  const payload = await readJson<{ data: Order }>(response);
   return payload.data;
 }
 
 export async function markOrderPaid(orderId: string): Promise<Order> {
-  const response = await fetch(`${baseUrl}/api/orders`, {
+  const payload = await request<{ data: Order }>(`${baseUrl}/api/orders`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id: orderId }),
+    body: { id: orderId },
   });
-  const payload = await readJson<{ data: Order }>(response);
   return payload.data;
 }
 
 export async function fetchRemoteCart(
   sessionId: string
 ): Promise<CartItem[]> {
-  const response = await fetch(
+  const payload = await request<{ data: CartItem[] }>(
     `${baseUrl}/api/cart/${encodeURIComponent(sessionId)}`
   );
-  const payload = await readJson<{ data: CartItem[] }>(response);
   return payload.data;
 }
 
@@ -70,29 +50,25 @@ export async function syncRemoteCart(
   sessionId: string,
   items: CartItem[]
 ): Promise<CartItem[]> {
-  const response = await fetch(
+  const payload = await request<{ data: CartItem[] }>(
     `${baseUrl}/api/cart/${encodeURIComponent(sessionId)}`,
     {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ items }),
+      body: { items },
     }
   );
-  const payload = await readJson<{ data: CartItem[] }>(response);
   return payload.data;
 }
 
 export async function createOrderWithGraphQL(
   order: OrderDraft
 ): Promise<Order> {
-  const response = await fetch(`${baseUrl}/api/graphql`, {
+  const payload = await request<{
+    data?: { createOrder?: Order };
+    errors?: Array<{ message?: string }>;
+  }>(`${baseUrl}/api/graphql`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+    body: {
       query: `
         mutation CreateOrder($total: Float!, $items: [CartItemInput!]!) {
           createOrder(total: $total, items: $items) {
@@ -108,15 +84,14 @@ export async function createOrderWithGraphQL(
         }
       `,
       variables: order,
-    }),
+    },
   });
-  const payload = await readJson<{
-    data?: { createOrder?: Order };
-    errors?: Array<{ message?: string }>;
-  }>(response);
 
   if (payload.errors?.length || !payload.data?.createOrder) {
-    throw new Error(payload.errors?.[0]?.message ?? "GraphQL request failed");
+    throw new AppError(
+      payload.errors?.[0]?.message ?? "GraphQL request failed",
+      { code: "HTTP" }
+    );
   }
   return payload.data.createOrder;
 }

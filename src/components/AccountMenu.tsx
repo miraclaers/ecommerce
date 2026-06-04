@@ -9,6 +9,14 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+  useClerk,
+  useUser,
+} from "@clerk/nextjs";
 import { useOrders } from "@/app/context/OrdersContext";
 import { useMessages } from "@/app/context/MessagesContext";
 import { useFavorites } from "@/app/context/FavoritesContext";
@@ -64,6 +72,8 @@ function MenuIcon({
 
 export default function AccountMenu() {
   const router = useRouter();
+  const { user } = useUser();
+  const { signOut } = useClerk();
   const { orders } = useOrders();
   const { unreadCount } = useMessages();
   const { favoritesCount } = useFavorites();
@@ -139,9 +149,27 @@ export default function AccountMenu() {
       setOpen(false);
       return;
     }
+    if (action === "signout") {
+      void signOut({ redirectUrl: "/" });
+      setOpen(false);
+      return;
+    }
     showToast(DEMO_MESSAGES[action]);
     setOpen(false);
   };
+
+  const displayName =
+    user?.fullName ??
+    user?.primaryEmailAddress?.emailAddress ??
+    "Guest";
+  const email =
+    user?.primaryEmailAddress?.emailAddress ?? "Sign in to sync orders";
+  const initials = displayName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const panelTransition =
     "absolute right-0 top-[calc(100%+10px)] z-[70] min-w-[280px] max-w-[min(calc(100vw-24px),320px)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] dark:border-zinc-700 dark:bg-zinc-900";
@@ -159,17 +187,44 @@ export default function AccountMenu() {
 
   return (
     <div className="relative shrink-0" ref={wrapRef}>
+      <Show when="signed-out">
+        <div className="flex items-center gap-2">
+          <SignInButton mode="modal">
+            <button
+              type="button"
+              className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            >
+              Sign in
+            </button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button
+              type="button"
+              className="rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-violet-700"
+            >
+              Sign up
+            </button>
+          </SignUpButton>
+        </div>
+      </Show>
+      <Show when="signed-in">
+      <div className="flex items-center gap-2">
+        <UserButton
+          appearance={{
+            elements: { avatarBox: "h-10 w-10" },
+          }}
+        />
       <button
         type="button"
         id={`${menuId}-trigger`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={`${menuId}-panel`}
-        aria-label="Account menu, Alex Demo"
+        aria-label={`Account menu, ${displayName}`}
         onClick={() => setOpen((v) => !v)}
         className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-gradient-to-b from-zinc-50 to-zinc-100 text-[11px] font-bold uppercase tracking-wide text-zinc-800 shadow-sm outline-none ring-violet-500 transition hover:border-zinc-300 hover:shadow-md focus-visible:ring-2 dark:border-zinc-600 dark:from-zinc-800 dark:to-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-500 forced-colors:border-[ButtonBorder]"
       >
-        <span aria-hidden>AD</span>
+        <span aria-hidden>{initials || "?"}</span>
       </button>
 
       <div
@@ -182,10 +237,10 @@ export default function AccountMenu() {
       >
         <div className="border-b border-zinc-100 px-3 pb-3 pt-2 dark:border-zinc-800">
           <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-            Alex Demo
+            {displayName}
           </p>
           <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-            alex.demo@example.com
+            {email}
           </p>
         </div>
 
@@ -405,6 +460,8 @@ export default function AccountMenu() {
           {toast}
         </div>
       ) : null}
+      </div>
+      </Show>
     </div>
   );
 }
