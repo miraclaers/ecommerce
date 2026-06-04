@@ -1,6 +1,6 @@
 # Mini Ecommerce (Next.js)
 
-A learning-focused ecommerce platform built with Next.js App Router. It demonstrates end-to-end product flows: catalog browsing, cart and checkout, order history, favorites, collections, and realtime order updates backed by REST and GraphQL APIs.
+A learning-focused ecommerce platform built with Next.js App Router. It demonstrates catalog and checkout flows, **Clerk authentication**, resilient API access, intentional rendering (SSG/ISR), and production-oriented patterns (tests, CI, observability).
 
 **Live:** [mini-ecommerce-nextjs-psi.vercel.app](https://mini-ecommerce-nextjs-psi.vercel.app)  
 **Repo:** [github.com/alejosworkstuff/mini-ecommerce-nextjs](https://github.com/alejosworkstuff/mini-ecommerce-nextjs)
@@ -9,243 +9,207 @@ A learning-focused ecommerce platform built with Next.js App Router. It demonstr
 
 ## Problem and Context
 
-I wanted a project that goes beyond static UI and reflects real commerce behavior: dynamic catalog pages, cart/session handling, multi-step checkout, and API-backed interactions.
+I wanted a project that goes beyond static UI and reflects real commerce behavior: dynamic catalog pages, cart/session handling, multi-step checkout, authenticated account areas, and API-backed interactions.
 
-The app is designed to showcase frontend-heavy product flows with backend patterns (REST, GraphQL, Redis caching, WebSockets, Docker, and deployment scaffolding).
+The app showcases frontend-heavy product flows plus backend patterns (REST, GraphQL, Redis caching, WebSockets, Docker, and deployment scaffolding).
 
 ## My Role
 
 - Built the full application architecture across UI, API routes, and React contexts
 - Implemented product, cart, checkout, favorites, collections, and order flows
-- Added Redis-based caching/session patterns with in-memory fallback
-- Integrated a WebSocket gateway for realtime order-status events
-- Added Vitest tests and GitHub Actions CI
+- Added **Clerk auth** (proxy middleware, protected routes, per-user orders)
+- Implemented a **resilient HTTP client** (timeout, retry, typed errors) and **SSG/ISR** catalog pages
+- Integrated Sentry, error boundaries, and structured API logging
+- Added Vitest + Playwright tests and GitHub Actions CI (including E2E on push)
 - Set up Docker Compose and AWS ECS deployment scaffolding
-
-## Architecture Overview
-
-```text
-mini-ecommerce/
-├── src/app/              # App Router pages and API route handlers
-├── src/app/context/      # Cart, orders, favorites, collections, messages, realtime
-├── src/components/       # Header, footer, product cards, checkout stepper, skeletons
-├── src/lib/              # Products, cart, Redis, API client, order store
-├── realtime-server.mjs   # Standalone WebSocket gateway (local/Docker)
-├── aws/                  # ECS task definition and deploy notes
-├── .github/workflows/    # CI and optional AWS deploy
-└── docker-compose.yml    # web + Redis + realtime
-```
-
-### Routes (UI)
-
-| Path | Purpose |
-|------|---------|
-| `/` | Home |
-| `/products` | Product listing |
-| `/product/[id]` | Product detail (tabs, favorite toggle, add to cart) |
-| `/cart` | Cart review |
-| `/checkout` | Checkout summary |
-| `/checkout/pay` | Payment step (simulated) |
-| `/checkout/success` | Success state |
-| `/checkout/error` | Error state |
-| `/my-purchases` | Order history |
-| `/favorites` | Saved products |
-| `/collections` | User-defined product collections |
-| `/messages` | In-app messages (demo inbox) |
-
-### React Contexts
-
-- **CartContext** — cart state and persistence via session API
-- **OrdersContext** — order list and creation
-- **FavoritesContext** — favorite product IDs (client persistence)
-- **CollectionsContext** — named collections of products
-- **MessagesContext** — demo messaging state
-- **RealtimeContext** — WebSocket connection to order-status events
-
-### API Surface (REST)
-
-- `GET /api/products` — list products
-- `GET /api/products/[id]` — product by ID
-- `GET|POST|PATCH /api/orders` — list, create, update orders
-- `GET|PUT /api/cart/[sessionId]` — read/update cart session
-
-### GraphQL
-
-- `POST /api/graphql` — queries: `products`, `product(id)`, `orders`; mutation: `createOrder`
-
-### Realtime Gateway
-
-- Standalone process: `realtime-server.mjs` (not a Next.js route)
-- Default URL: `ws://localhost:4001` (`NEXT_PUBLIC_WS_URL`)
-- Broadcasts parsed JSON messages to all connected clients
-
----
-
-## Key Features
-
-- Product catalog with detail pages, skeleton loading, and page transitions
-- Cart add/update/remove with session-backed persistence
-- Multi-step checkout (summary → pay → success/error) with **CheckoutStepper**
-- **Favorites** and **collections** for organizing products
-- **My purchases** order history
-- **Messages** demo inbox
-- **Dark mode** toggle with `localStorage` (`minishop-theme`) and system preference fallback
-- Open Graph and Twitter metadata on the root layout
-- REST + GraphQL API surface
-- Redis-backed cache/session with in-memory fallback when Redis is unavailable
-- WebSocket order-status updates
-- Fixed footer navigation (portfolio and GitHub links)
-
-## Technical Decisions and Tradeoffs
-
-- **Next.js 16 App Router** — server/client composition and route handlers in one codebase.
-- **REST + GraphQL** — compares two API styles; adds complexity but broadens the portfolio story.
-- **Redis + in-memory fallback** — resilient local/dev runs without a running Redis instance.
-- **Separate realtime server** — keeps WebSocket concerns out of the Next.js server process; matches Docker Compose layout.
-- **Docker + ECS scaffolding** — demonstrates deployment readiness without requiring a live AWS deploy.
 
 ---
 
 ## Tech Stack
 
-- Next.js 16 (App Router), React 19, TypeScript 5
+- Next.js 16 (App Router), React 19, TypeScript 5 (strict)
 - Tailwind CSS 3
+- **Clerk** (`@clerk/nextjs`) — OIDC sessions, protected routes
+- **Sentry** (`@sentry/nextjs`) — optional error monitoring
 - Node.js route handlers (REST + GraphQL)
-- Redis 5 (`redis` package)
-- WebSockets (`ws`)
-- Vitest 4, Testing Library, jsdom
-- Docker / Docker Compose
-- GitHub Actions
-- AWS ECS deployment scaffolding (optional)
+- Redis 5, WebSockets (`ws`)
+- Vitest 4, Testing Library, Playwright
+- Docker / Docker Compose, GitHub Actions
 
 ---
 
-## CI / Quality Baseline
+## Architecture Overview
 
-GitHub Actions (`.github/workflows/ci.yml`) on pull requests and pushes to `main`:
-
-- `npm run lint`
-- `npm run type-check`
-- `npm run test` (Vitest)
-- `npm run build`
-
-Run the same pipeline locally:
-
-```bash
-npm install
-npm run ci
+```text
+mini-ecommerce/
+├── src/app/              # App Router pages, API routes, error boundaries
+├── src/app/context/      # Cart, orders, favorites, collections, messages, realtime
+├── src/components/       # UI, ProductsCatalog, ProductDetailView, AccountMenu
+├── src/hooks/            # useDebouncedValue, useAsyncResource, useApiMutation, …
+├── src/lib/              # http-client, api-client, product-data, order-store
+├── src/proxy.ts          # Clerk clerkMiddleware + protected routes
+├── docs/                 # Architecture, DoD, testing strategy
+├── e2e/                  # Playwright specs
+├── realtime-server.mjs   # WebSocket gateway (local/Docker)
+├── aws/                  # ECS task definition and deploy notes
+└── .github/workflows/    # CI (+ optional AWS deploy)
 ```
 
-### Tests
+See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-level rendering decisions.
 
-| File | Coverage |
-|------|----------|
-| `src/lib/cart-logic.test.ts` | Pure cart helpers |
-| `src/app/context/cart-context.integration.test.tsx` | Cart context behavior |
+### Routes (UI)
 
-Configured in `vitest.config.ts` with `@/` path alias and jsdom.
+| Path | Purpose | Access |
+|------|---------|--------|
+| `/` | Home | Public |
+| `/products` | Product listing (server data + client filters/search) | Public |
+| `/product/[id]` | Product detail (SSG/ISR + client cart/favorites) | Public |
+| `/cart`, `/checkout/*` | Cart and checkout flow | Public |
+| `/sign-in`, `/sign-up` | Clerk auth UI | Public |
+| `/my-purchases` | Order history | Signed in |
+| `/favorites`, `/collections`, `/messages`, `/settings` | Account features | Signed in |
+| `/admin/orders` | All orders (demo admin) | Signed in + `role: admin` in Clerk |
+
+### API Surface
+
+**REST**
+
+- `GET /api/products`, `GET /api/products/[id]`
+- `GET|POST|PATCH /api/orders` — requires Clerk session; scoped by `userId`
+- `GET|PUT /api/cart/[sessionId]`
+
+**GraphQL** — `POST /api/graphql` (products public; orders require auth)
+
+**Realtime** — `realtime-server.mjs` at `NEXT_PUBLIC_WS_URL` (default `ws://localhost:4001`)
+
+---
+
+## Key Features
+
+- Product catalog with SSG/ISR detail pages, debounced search, and filters
+- Cart with session-backed persistence and multi-step checkout
+- **Clerk authentication** — sign-in/up, `UserButton`, protected account routes
+- Favorites, collections, messages (demo), and per-user order history
+- **HTTP resilience** — centralized client with timeout, retry, `AppError`, `ApiState<T>`
+- Dark mode, Open Graph metadata, REST + GraphQL, Redis + WebSocket demos
+- **Observability** — Sentry (optional), `error.tsx`, `ErrorBoundary`, structured logs
+
+---
+
+## Authentication (Clerk)
+
+- `clerkMiddleware()` in [`src/proxy.ts`](src/proxy.ts) (includes `/__clerk/:path*` matcher)
+- `<ClerkProvider>` in [`src/app/layout.tsx`](src/app/layout.tsx)
+- Header: `<Show>`, `<SignInButton>`, `<SignUpButton>`, `<UserButton>` + account menu
+- Server routes use `auth()` from `@clerk/nextjs/server` for orders
+- Admin: set `publicMetadata.role` to `"admin"` in Clerk for `/admin/orders`
+
+**Local setup:** copy `.env.example` → `.env.local` and add keys from [dashboard.clerk.com](https://dashboard.clerk.com).
+
+**Vercel:** add the same variables in Project → Settings → Environment Variables (never commit real keys).
 
 ---
 
 ## Environment Variables
 
-Copy `.env.example` to `.env.local`:
-
-| Variable | Purpose |
-|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Optional API base override |
-| `NEXT_PUBLIC_WS_URL` | WebSocket gateway URL (default `ws://localhost:4001`) |
-| `REDIS_URL` | Redis connection (default `redis://localhost:6379`) |
-| `REALTIME_PORT` | Port for `realtime-server.mjs` (default `4001`) |
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes (auth) | Clerk publishable key |
+| `CLERK_SECRET_KEY` | Yes (auth) | Clerk secret key (server only) |
+| `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry DSN (client + server) |
+| `SENTRY_AUTH_TOKEN` | No | Sentry upload token (builds) |
+| `NEXT_PUBLIC_API_BASE_URL` | No | API base override (empty = same origin) |
+| `NEXT_PUBLIC_WS_URL` | No | WebSocket URL (default `ws://localhost:4001`) |
+| `REDIS_URL` | No | Redis (default `redis://localhost:6379`) |
 
 ---
 
 ## Local Development
 
-### App only
-
 ```bash
 npm install
+cp .env.example .env.local   # then add Clerk keys
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Realtime gateway (separate terminal)
+**Realtime (optional, second terminal):** `npm run dev:realtime`  
+**Full stack:** `docker compose up --build`
+
+---
+
+## CI / Quality
+
+GitHub Actions on PRs and `main` (`.github/workflows/ci.yml`):
+
+- lint → type-check → Vitest → build → Playwright E2E
+
+Local equivalents:
 
 ```bash
-npm run dev:realtime
+npm run ci          # lint, type-check, test, build
+npm run ci:full     # above + Playwright E2E
+npm run test:e2e    # E2E only (starts production server)
 ```
 
-### Full stack (app + Redis + realtime)
+CI uses **placeholder** Clerk keys only — not your real secrets.
 
-```bash
-docker compose up --build
-```
+> If GitHub Actions fails with a billing message, run `npm run ci` locally; the pipeline definition is still valid.
 
-Services: **web** (port 3000), **redis** (6379), **realtime** (4001).
+### Tests
+
+| Area | Files |
+|------|--------|
+| Cart logic | `src/lib/cart-logic.test.ts` |
+| Cart context | `src/app/context/cart-context.integration.test.tsx` |
+| HTTP client | `src/lib/http-client.test.ts` |
+| Hooks | `src/hooks/useDebouncedValue.test.ts` |
+| E2E checkout | `e2e/checkout-happy-path.spec.ts` |
+
+Details: [`docs/testing-strategy.md`](docs/testing-strategy.md)
+
+---
+
+## Engineering Docs
+
+- [`docs/frontend-architecture.md`](docs/frontend-architecture.md) — SSR/SSG/ISR/Client split
+- [`docs/definition-of-done.md`](docs/definition-of-done.md)
+- [`docs/testing-strategy.md`](docs/testing-strategy.md)
+- `.github/pull_request_template.md`
 
 ---
 
 ## Deployment
 
-- **Vercel:** primary live deployment (see live URL above).
-- **AWS ECS:** workflow `.github/workflows/deploy-aws.yml`, task template `aws/task-definition.json`, notes in `aws/deploy.md`.
-- Requires GitHub variables/secrets for ECR, ECS cluster/service, and `AWS_ROLE_TO_ASSUME`.
+- **Vercel:** primary live URL (configure Clerk + optional Sentry env vars in the dashboard).
+- **AWS ECS:** `.github/workflows/deploy-aws.yml`, `aws/task-definition.json`, `aws/deploy.md`.
+
+---
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Auth buttons do nothing / Clerk errors | Keys in `.env.local`; restart `npm run dev` |
+| Redirect loop on account pages | Valid Clerk keys; routes `/sign-in`, `/sign-up` exist |
+| Orders empty after login | Sign in before checkout; orders are per Clerk `userId` |
+| API timeout errors | Network tab; default 8s timeout in `http-client` |
+| Build fails on Vercel | Clerk env vars in Vercel project settings |
+| Sentry not receiving events | `NEXT_PUBLIC_SENTRY_DSN` set in env |
+| GitHub Actions blocked | Account billing; use local `npm run ci` |
 
 ---
 
 ## Case Study Highlights (Portfolio Use)
 
-- **Challenge:** Model a realistic ecommerce flow with multiple data-access patterns and clear UI state boundaries.
-- **Approach:** Separate UI contexts from API routes; layer Redis caching and realtime updates incrementally.
-- **Result:** A demo that shows product UX plus production-oriented patterns (tests, CI, containers, optional cloud deploy).
-
-## Authentication (Clerk)
-
-- OIDC session via Clerk (`@clerk/nextjs`) with `clerkMiddleware()` in `src/proxy.ts`
-- UI: `<Show>`, `<SignInButton>`, `<SignUpButton>`, `<UserButton>` in the header account area
-- Protected routes: `/my-purchases`, `/messages`, `/collections`, `/settings`, `/admin/*`
-- Orders API scoped by authenticated `userId`
-- Admin panel: `/admin/orders` (requires `publicMetadata.role: "admin"` in Clerk)
-
-Copy `.env.example` → `.env.local` and set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
-
-## HTTP client and API resilience
-
-- Central `http-client` with timeout (`AbortController`), retry on 429/502/503, and typed `AppError`
-- Discriminated union `ApiState<T>` for loading/success/error UI
-- See `src/lib/http-client.ts`, `src/lib/api-state.ts`
-
-## Rendering strategy
-
-Documented in [`docs/frontend-architecture.md`](docs/frontend-architecture.md): SSG/ISR product pages, server-loaded catalog, client cart/checkout.
-
-## Observability
-
-- Sentry (`@sentry/nextjs`) when `NEXT_PUBLIC_SENTRY_DSN` is set
-- App Router `error.tsx` / `global-error.tsx` and `ErrorBoundary` for client islands
-- Structured JSON logs in API routes (`src/lib/logger.ts`)
-
-### Troubleshooting
-
-| Symptom | Check |
-| --- | --- |
-| Redirect loop on account pages | Clerk keys in `.env.local`; sign-in URLs `/sign-in`, `/sign-up` |
-| Orders empty after login | Sign in before checkout; orders are per Clerk `userId` |
-| API timeout errors | Network tab; default 8s timeout in `http-client` |
-| Build fails on Vercel | Add Clerk + optional Sentry env vars in project settings |
-| Sentry not receiving events | `NEXT_PUBLIC_SENTRY_DSN` set; reproduce error and check digest in UI |
-
-## Engineering docs
-
-- [`docs/frontend-architecture.md`](docs/frontend-architecture.md)
-- [`docs/definition-of-done.md`](docs/definition-of-done.md)
-- [`docs/testing-strategy.md`](docs/testing-strategy.md)
-- PR template: `.github/pull_request_template.md`
+- **Challenge:** Model realistic ecommerce with auth, resilient APIs, and clear rendering choices.
+- **Approach:** Clerk for sessions; server-loaded catalog with client islands; typed HTTP layer; tests + CI + docs.
+- **Result:** A demo that reads as “junior with SaaS-style mechanics,” not only a UI exercise.
 
 ## What I Would Improve Next
 
-- Performance budgets and accessibility audits
-- Redis persistence for orders in multi-instance deploys
-- Preview deployments with required CI checks (when GitHub billing is active)
+- Clerk auth E2E with test users
+- Performance budgets and accessibility audit with before/after notes
+- Persistent order store (Redis/DB) for multi-instance deploys
+- README CI badges when GitHub Actions billing is active

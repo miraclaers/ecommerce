@@ -7,7 +7,8 @@
 | Unit | Vitest | `http-client`, `cart-logic`, hooks (`useDebouncedValue`) |
 | Integration | Vitest + Testing Library | `CartContext` + cart persistence |
 | E2E | Playwright | Checkout happy path (browse → cart → success) |
-| CI | GitHub Actions / local `npm run ci` | lint → type-check → test → build |
+| CI | GitHub Actions | lint → type-check → test → build → Playwright E2E |
+| CI (local) | `npm run ci` / `npm run ci:full` | `ci` skips E2E; `ci:full` includes Playwright |
 
 ## Commands
 
