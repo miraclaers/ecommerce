@@ -46,7 +46,7 @@ export default function CollectionsPage() {
   };
 
   return (
-    <main className="mx-auto max-w-5xl p-8">
+    <div className="mx-auto max-w-5xl p-8">
       <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         Collections
       </h1>
@@ -249,6 +249,6 @@ export default function CollectionsPage() {
           })}
         </div>
       )}
-    </main>
+    </div>
   );
 }

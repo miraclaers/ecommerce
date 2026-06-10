@@ -52,6 +52,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <ClerkProvider>
           <ClerkAuthBridge />
           <RealtimeProvider>
@@ -61,7 +64,7 @@ export default function RootLayout({
                   <CollectionsProvider>
                     <MessagesProvider>
                       <Header />
-                      <main className="flex-1">
+                      <main id="main-content" className="flex-1">
                         <PageTransition>{children}</PageTransition>
                       </main>
                       <Footer />

@@ -68,7 +68,7 @@ export default function ProductsCatalog({
   }, [activeCategory, debouncedSearch, maxPrice, minPrice, products, sortBy]);
 
   return (
-    <main className="p-4 sm:p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">Products</h1>
 
       <label className="mb-6 block max-w-md">
@@ -149,10 +149,14 @@ export default function ProductsCatalog({
             </div>
 
             <div className="flex min-w-[11rem] flex-col justify-end">
-              <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+              <label
+                htmlFor="products-sort-by"
+                className="text-sm font-semibold text-zinc-700 dark:text-zinc-200"
+              >
                 Sort by
               </label>
               <select
+                id="products-sort-by"
                 value={sortBy}
                 onChange={(event) =>
                   setSortBy(
@@ -180,10 +184,14 @@ export default function ProductsCatalog({
           ? Array.from({ length: 4 }).map((_, index) => (
               <ProductCardSkeleton key={`product-skeleton-${index}`} />
             ))
-          : filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          : filteredProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                priority={index === 0}
+              />
             ))}
       </ul>
-    </main>
+    </div>
   );
 }

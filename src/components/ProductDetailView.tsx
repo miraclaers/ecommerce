@@ -50,7 +50,7 @@ export default function ProductDetailView({
   };
 
   return (
-    <main className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
+    <div className="max-w-5xl mx-auto p-8 space-y-16 pb-24">
       <section className="grid md:grid-cols-2 gap-12">
         <div className="relative">
           <div className="border-4 border-violet-600 rounded-xl overflow-hidden">
@@ -109,6 +109,10 @@ export default function ProductDetailView({
             <button
               type="button"
               onClick={() => toggleFavorite(product.id)}
+              aria-label={
+                favorite ? "Remove from favorites" : "Add to favorites"
+              }
+              aria-pressed={favorite}
               className={`inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition ${
                 favorite
                   ? "border-amber-300 bg-amber-100 text-amber-700 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
@@ -124,11 +128,19 @@ export default function ProductDetailView({
           </div>
 
           <div className="mt-10">
-            <div className="-mx-1 flex gap-4 overflow-x-auto border-b border-zinc-200 px-1 sm:gap-6 dark:border-zinc-800">
+            <div
+              role="tablist"
+              aria-label="Product information"
+              className="-mx-1 flex gap-4 overflow-x-auto border-b border-zinc-200 px-1 sm:gap-6 dark:border-zinc-800"
+            >
               {(["description", "shipping", "reviews"] as const).map((tab) => (
                 <button
                   key={tab}
                   type="button"
+                  role="tab"
+                  id={`product-tab-${tab}`}
+                  aria-selected={activeTab === tab}
+                  aria-controls={`product-panel-${tab}`}
                   onClick={() => setActiveTab(tab)}
                   className={`shrink-0 pb-2 capitalize ${
                     activeTab === tab
@@ -141,7 +153,12 @@ export default function ProductDetailView({
               ))}
             </div>
 
-            <div className="mt-6 text-gray-600 dark:text-zinc-300 text-sm">
+            <div
+              role="tabpanel"
+              id={`product-panel-${activeTab}`}
+              aria-labelledby={`product-tab-${activeTab}`}
+              className="mt-6 text-gray-600 dark:text-zinc-300 text-sm"
+            >
               {activeTab === "description" && (
                 <p>
                   {product.description} Built for daily use with a focus on
@@ -185,10 +202,14 @@ export default function ProductDetailView({
       </section>
 
       {showToast ? (
-        <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-violet-200 bg-white px-4 py-3 text-sm font-medium text-zinc-900 shadow-lg dark:border-violet-500/40 dark:bg-zinc-900 dark:text-zinc-100 toast-pop">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 rounded-xl border border-violet-200 bg-white px-4 py-3 text-sm font-medium text-zinc-900 shadow-lg dark:border-violet-500/40 dark:bg-zinc-900 dark:text-zinc-100 toast-pop"
+        >
           Added to cart
         </div>
       ) : null}
-    </main>
+    </div>
   );
 }

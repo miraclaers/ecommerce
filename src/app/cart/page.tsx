@@ -79,7 +79,7 @@ export default function CartPage() {
   );
 
   return (
-    <main className="mx-auto max-w-4xl p-4 sm:p-8">
+    <div className="mx-auto max-w-4xl p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">
         Cart
       </h1>
@@ -185,18 +185,22 @@ export default function CartPage() {
                     </span>
 
                     <button
+                      type="button"
                       onClick={() =>
                         decreaseQuantity(item!.id)
                       }
+                      aria-label={`Decrease quantity of ${item!.title}`}
                       className="px-3 py-1 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                     >
                       -
                     </button>
 
                     <button
+                      type="button"
                       onClick={() =>
                         increaseQuantity(item!.id)
                       }
+                      aria-label={`Increase quantity of ${item!.title}`}
                       className="px-3 py-1 border border-zinc-300 dark:border-zinc-700 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                     >
                       +
@@ -258,6 +262,6 @@ export default function CartPage() {
           </div>
         </>
       )}
-    </main>
+    </div>
   );
 }

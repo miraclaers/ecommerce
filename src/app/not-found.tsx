@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="p-8 max-w-3xl mx-auto text-center">
+    <div className="p-8 max-w-3xl mx-auto text-center">
       <h1 className="text-3xl font-bold">Page not found</h1>
       <p className="mt-3 text-gray-600 dark:text-zinc-300">
         The page you are looking for doesn&apos;t exist.
@@ -21,6 +21,6 @@ export default function NotFound() {
           Back home
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

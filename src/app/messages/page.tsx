@@ -68,7 +68,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-6xl p-4 sm:p-6">
+    <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">
       <h1 className="mb-1 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         Messages
       </h1>
@@ -201,6 +201,6 @@ export default function MessagesPage() {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

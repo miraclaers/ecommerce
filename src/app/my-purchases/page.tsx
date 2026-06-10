@@ -35,7 +35,7 @@ export default function MyPurchasesPage() {
 
   if (orders.length === 0) {
     return (
-      <main className="mx-auto max-w-4xl p-8">
+      <div className="mx-auto max-w-4xl p-8">
         <section className="rounded-2xl border border-dashed border-violet-300/70 bg-violet-50/40 p-10 text-center dark:border-violet-500/40 dark:bg-violet-950/20">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">
             No purchases yet
@@ -50,12 +50,12 @@ export default function MyPurchasesPage() {
             Start shopping
           </Link>
         </section>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-8">
+    <div className="mx-auto max-w-4xl p-8">
       <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         My purchases
       </h1>
@@ -126,6 +126,6 @@ export default function MyPurchasesPage() {
           </li>
         ))}
       </ul>
-    </main>
+    </div>
   );
 }

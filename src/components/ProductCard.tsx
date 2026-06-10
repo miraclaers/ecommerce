@@ -9,9 +9,10 @@ import CollectionPicker from "@/components/CollectionPicker";
 
 type Props = {
   product: Product;
+  priority?: boolean;
 };
 
-function ProductCard({ product }: Props) {
+function ProductCard({ product, priority = false }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
 
@@ -59,13 +60,14 @@ function ProductCard({ product }: Props) {
       <Link href={`/product/${product.id}`} className="block">
       <Image
       src={product.image}
-      alt={product.image}
+      alt={product.title}
       width={600}
       height={400}
+      priority={priority}
       sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
       className="relative z-0 w-full h-40 rounded-md object-cover mb-4 bg-zinc-100/5 transition-all duration-300 ease-out group-hover/card:h-[12.5rem] group-hover/card:scale-[0.99]"
       />
-        <h3 className="font-semibold text-base text-zinc-900 dark:text-zinc-100">{product.title}</h3>
+        <h2 className="font-semibold text-base text-zinc-900 dark:text-zinc-100">{product.title}</h2>
         <p className="text-gray-600 mt-1 text-sm dark:text-zinc-400">${product.price}</p>
       </Link>
 

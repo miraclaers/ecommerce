@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+.skip-link {
+  position: absolute;
+  left: -10000px;
+  top: 1rem;
+  z-index: 100;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #18181b;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.skip-link:focus {
+  left: 1rem;
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+.dark .skip-link {
+  background: #18181b;
+  color: #f4f4f5;
+}
+
 @layer base {
   html {
     color-scheme: light;

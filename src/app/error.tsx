@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-16 text-center">
+    <div className="mx-auto max-w-lg px-4 py-16 text-center">
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
         Something went wrong
       </h1>
@@ -41,6 +41,6 @@ export default function Error({
           Home
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

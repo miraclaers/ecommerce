@@ -39,7 +39,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <main className="p-8 max-w-3xl mx-auto">
+      <div className="p-8 max-w-3xl mx-auto">
         <section className="border border-dashed border-violet-300/70 rounded-2xl p-10 text-center bg-violet-50/40 dark:border-violet-500/40 dark:bg-violet-950/20">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
             <svg
@@ -78,12 +78,12 @@ export default function CheckoutPage() {
             </Link>
           </div>
         </section>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="p-8 max-w-3xl mx-auto">
+    <div className="p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
 
       <ul className="space-y-6">
@@ -116,6 +116,6 @@ export default function CheckoutPage() {
           Pay now
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

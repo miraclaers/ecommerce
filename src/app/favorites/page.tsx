@@ -34,7 +34,7 @@ export default function FavoritesPage() {
 
   if (!isLoading && favoriteProducts.length === 0) {
     return (
-      <main className="mx-auto max-w-4xl p-8">
+      <div className="mx-auto max-w-4xl p-8">
         <section className="rounded-2xl border border-dashed border-amber-300/70 bg-amber-50/40 p-10 text-center dark:border-amber-500/40 dark:bg-amber-950/20">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">
             No favorites yet
@@ -49,12 +49,12 @@ export default function FavoritesPage() {
             Browse products
           </Link>
         </section>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="p-8">
+    <div className="p-8">
       <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         Favorites
       </h1>
@@ -71,6 +71,6 @@ export default function FavoritesPage() {
               <ProductCard key={product.id} product={product} />
             ))}
       </ul>
-    </main>
+    </div>
   );
 }

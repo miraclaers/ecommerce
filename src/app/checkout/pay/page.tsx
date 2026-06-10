@@ -16,7 +16,7 @@ export default function PayPage() {
   };
 
   return (
-    <main className="mx-auto max-w-lg p-4 sm:p-8">
+    <div className="mx-auto max-w-lg p-4 sm:p-8">
       <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
           <svg
@@ -56,6 +56,6 @@ export default function PayPage() {
           This is a demo checkout. No real payment is processed.
         </p>
       </div>
-    </main>
+    </div>
   );
 }

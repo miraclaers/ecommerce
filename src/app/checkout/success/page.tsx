@@ -52,7 +52,7 @@ export default function CheckoutSuccessPage() {
   }, [addOrder, clearCart, total, cart, setOrderPaid, sendEvent]);
 
   return (
-    <main className="p-8 max-w-lg mx-auto">
+    <div className="p-8 max-w-lg mx-auto">
       <div className="border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-600/10 text-green-700">
           <svg
@@ -96,6 +96,6 @@ export default function CheckoutSuccessPage() {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

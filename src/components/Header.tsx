@@ -34,7 +34,10 @@ export default function Header() {
 
   return (
     <header className="w-full border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-      <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-0">
+      <nav
+        aria-label="Primary"
+        className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-0"
+      >
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
