@@ -18,9 +18,10 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
     env: {
+      // Clerk v7 validates key shape (pk_test_<base64 of "*.clerk.accounts.dev$">).
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
         process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ??
-        "pk_test_e2e_placeholder",
+        "pk_test_Y2ktcGxhY2Vob2xkZXIuY2xlcmsuYWNjb3VudHMuZGV2JA",
       CLERK_SECRET_KEY:
         process.env.CLERK_SECRET_KEY ?? "sk_test_e2e_placeholder",
     },
