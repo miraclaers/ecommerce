@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { listProducts } from "@/lib/product-data";
 import { getJson, setJson } from "@/lib/redis";
+import { isValidCategory } from "@/lib/validate";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
+
+  if (category && !isValidCategory(category)) {
+    return NextResponse.json(
+      { error: "Invalid category" },
+      { status: 400 }
+    );
+  }
+
   const cacheKey = category
     ? `products:category:${category}`
     : "products:all";

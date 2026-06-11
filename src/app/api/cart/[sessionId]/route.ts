@@ -1,25 +1,21 @@
 import { NextResponse } from "next/server";
 import { getJson, setJson } from "@/lib/redis";
 import type { CartItem } from "@/lib/types";
-
-function isValidCart(items: unknown): items is CartItem[] {
-  return (
-    Array.isArray(items) &&
-    items.every(
-      (item) =>
-        item &&
-        typeof item === "object" &&
-        typeof item.id === "string" &&
-        typeof item.quantity === "number"
-    )
-  );
-}
+import { isValidCart, isValidSessionId } from "@/lib/validate";
 
 export async function GET(
   _request: Request,
   context: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await context.params;
+
+  if (!isValidSessionId(sessionId)) {
+    return NextResponse.json(
+      { error: "Invalid session id" },
+      { status: 400 }
+    );
+  }
+
   const data = await getJson<CartItem[]>(`cart:${sessionId}`);
   return NextResponse.json({ data: data ?? [] });
 }
@@ -29,6 +25,14 @@ export async function PUT(
   context: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await context.params;
+
+  if (!isValidSessionId(sessionId)) {
+    return NextResponse.json(
+      { error: "Invalid session id" },
+      { status: 400 }
+    );
+  }
+
   const body = (await request.json()) as { items?: unknown };
 
   if (!isValidCart(body.items)) {

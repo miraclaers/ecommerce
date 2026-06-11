@@ -2,7 +2,13 @@ import { auth } from "@clerk/nextjs/server";
 import { graphql, buildSchema } from "graphql";
 import { listProducts, readProductById } from "@/lib/product-data";
 import { createOrder, listOrders } from "@/lib/order-store";
+import { validateGraphQLQuery } from "@/lib/graphql-guard";
 import type { CartItem } from "@/lib/types";
+import {
+  isValidCart,
+  isValidProductId,
+  isValidTotal,
+} from "@/lib/validate";
 
 const schema = buildSchema(`
   type Product {
@@ -60,11 +66,24 @@ export async function POST(request: Request) {
     );
   }
 
+  const queryError = validateGraphQLQuery(body.query);
+  if (queryError) {
+    return Response.json(
+      { errors: [{ message: queryError }] },
+      { status: 400 }
+    );
+  }
+
   const { userId } = await auth();
 
   const rootValue = {
     products: () => listProducts(),
-    product: ({ id }: { id: string }) => readProductById(id),
+    product: ({ id }: { id: string }) => {
+      if (!isValidProductId(id)) {
+        return null;
+      }
+      return readProductById(id);
+    },
     orders: () => (userId ? listOrders(userId) : []),
     createOrder: ({
       total,
@@ -75,6 +94,9 @@ export async function POST(request: Request) {
     }) => {
       if (!userId) {
         throw new Error("Unauthorized");
+      }
+      if (!isValidTotal(total) || !isValidCart(items)) {
+        throw new Error("Invalid order payload");
       }
       return createOrder(userId, { total, items });
     },

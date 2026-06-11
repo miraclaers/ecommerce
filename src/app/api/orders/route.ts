@@ -2,20 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { createOrder, listOrders, markOrderAsPaid } from "@/lib/order-store";
 import { log } from "@/lib/logger";
-import type { CartItem, OrderDraft } from "@/lib/types";
-
-function isValidCart(items: unknown): items is CartItem[] {
-  return (
-    Array.isArray(items) &&
-    items.every(
-      (item) =>
-        item &&
-        typeof item === "object" &&
-        typeof item.id === "string" &&
-        typeof item.quantity === "number"
-    )
-  );
-}
+import type { OrderDraft } from "@/lib/types";
+import { isValidCart, isValidOrderId, isValidTotal } from "@/lib/validate";
 
 export async function GET() {
   const { userId } = await auth();
@@ -34,11 +22,7 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as Partial<OrderDraft>;
 
-  if (
-    typeof body.total !== "number" ||
-    Number.isNaN(body.total) ||
-    !isValidCart(body.items)
-  ) {
+  if (!isValidTotal(body.total) || !isValidCart(body.items)) {
     return NextResponse.json(
       { error: "Invalid order payload" },
       { status: 400 }
@@ -71,9 +55,9 @@ export async function PATCH(request: Request) {
   }
 
   const body = (await request.json()) as { id?: string };
-  if (!body.id) {
+  if (!body.id || !isValidOrderId(body.id)) {
     return NextResponse.json(
-      { error: "Missing order id" },
+      { error: "Invalid order id" },
       { status: 400 }
     );
   }
