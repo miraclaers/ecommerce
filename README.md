@@ -5,6 +5,12 @@ A learning-focused ecommerce platform built with Next.js App Router. It demonstr
 **Live:** [mini-ecommerce-nextjs-psi.vercel.app](https://mini-ecommerce-nextjs-psi.vercel.app)  
 **Repo:** [github.com/alejosworkstuff/mini-ecommerce-nextjs](https://github.com/alejosworkstuff/mini-ecommerce-nextjs)
 
+## Screenshots
+
+| Home | Product catalog | Cart | Clerk sign-in |
+|:---:|:---:|:---:|:---:|
+| ![Home](./docs/screenshots/main.png) | ![Products](./docs/screenshots/products.png) | ![Cart](./docs/screenshots/cart.png) | ![Sign in](./docs/screenshots/sign-in.png) |
+
 ---
 
 ## Problem and Context
