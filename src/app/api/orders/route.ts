@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { createOrder, listOrders, markOrderAsPaid } from "@/lib/order-store";
 import { log } from "@/lib/logger";
+import { computeOrderTotal } from "@/lib/order-pricing";
 import type { OrderDraft } from "@/lib/types";
 import { isValidCart, isValidOrderId, isValidTotal } from "@/lib/validate";
 
@@ -11,7 +12,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json({ data: listOrders(userId) });
+  return NextResponse.json({ data: await listOrders(userId) });
 }
 
 export async function POST(request: Request) {
@@ -22,16 +23,31 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as Partial<OrderDraft>;
 
-  if (!isValidTotal(body.total) || !isValidCart(body.items)) {
+  if (!isValidCart(body.items)) {
     return NextResponse.json(
       { error: "Invalid order payload" },
       { status: 400 }
     );
   }
 
+  const verifiedTotal = computeOrderTotal(body.items);
+  if (verifiedTotal === null || !isValidTotal(body.total)) {
+    return NextResponse.json(
+      { error: "Invalid order payload" },
+      { status: 400 }
+    );
+  }
+
+  if (body.total !== verifiedTotal) {
+    return NextResponse.json(
+      { error: "Order total does not match catalog prices" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const order = createOrder(userId, {
-      total: body.total,
+    const order = await createOrder(userId, {
+      total: verifiedTotal,
       items: body.items,
     });
     log("info", "order.created", { userId, orderId: order.id });
@@ -62,7 +78,7 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const order = markOrderAsPaid(userId, body.id);
+  const order = await markOrderAsPaid(userId, body.id);
   if (!order) {
     return NextResponse.json(
       { error: "Order not found" },

@@ -28,6 +28,14 @@ test.describe("auth guard", () => {
     expect(response.headers().location).toMatch(/sign-in/);
   });
 
+  test("unauthenticated user visiting /favorites is redirected to sign-in", async ({
+    request,
+  }) => {
+    const response = await request.get("/favorites", { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers().location).toMatch(/sign-in/);
+  });
+
   test("sign-in page is publicly accessible", async ({ request }) => {
     const response = await request.get("/sign-in", { maxRedirects: 0 });
     expect(response.status()).toBe(200);

@@ -2,6 +2,17 @@
   "name": "mini-ecommerce",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://mini-ecommerce-nextjs-psi.vercel.app",
+  "keywords": [
+    "portfolio",
+    "javascript",
+    "typescript",
+    "nextjs",
+    "react",
+    "clerk",
+    "playwright",
+    "vitest"
+  ],
   "scripts": {
     "dev": "next dev",
     "dev:realtime": "node realtime-server.mjs",

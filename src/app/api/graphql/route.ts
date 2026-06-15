@@ -3,6 +3,7 @@ import { graphql, buildSchema } from "graphql";
 import { listProducts, readProductById } from "@/lib/product-data";
 import { createOrder, listOrders } from "@/lib/order-store";
 import { validateGraphQLQuery } from "@/lib/graphql-guard";
+import { computeOrderTotal } from "@/lib/order-pricing";
 import type { CartItem } from "@/lib/types";
 import {
   isValidCart,
@@ -84,8 +85,8 @@ export async function POST(request: Request) {
       }
       return readProductById(id);
     },
-    orders: () => (userId ? listOrders(userId) : []),
-    createOrder: ({
+    orders: async () => (userId ? await listOrders(userId) : []),
+    createOrder: async ({
       total,
       items,
     }: {
@@ -95,10 +96,19 @@ export async function POST(request: Request) {
       if (!userId) {
         throw new Error("Unauthorized");
       }
-      if (!isValidTotal(total) || !isValidCart(items)) {
+      if (!isValidCart(items)) {
         throw new Error("Invalid order payload");
       }
-      return createOrder(userId, { total, items });
+
+      const verifiedTotal = computeOrderTotal(items);
+      if (verifiedTotal === null || !isValidTotal(total)) {
+        throw new Error("Invalid order payload");
+      }
+      if (total !== verifiedTotal) {
+        throw new Error("Order total does not match catalog prices");
+      }
+
+      return createOrder(userId, { total: verifiedTotal, items });
     },
   };
 
