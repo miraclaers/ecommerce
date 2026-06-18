@@ -9,7 +9,7 @@ A learning-focused ecommerce platform built with Next.js App Router. It demonstr
 
 | Home | Product catalog | Cart | Clerk sign-in |
 |:---:|:---:|:---:|:---:|
-| ![Home](./docs/screenshots/main.png) | ![Products](./docs/screenshots/products.png) | ![Cart](./docs/screenshots/cart.png) | ![Sign in](./docs/screenshots/sign-in.png) |
+| ![Home](./docs/screenshots/main.webp) | ![Products](./docs/screenshots/products.webp) | ![Cart](./docs/screenshots/cart.webp) | ![Sign in](./docs/screenshots/sign-in.webp) |
 
 ---
 
