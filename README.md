@@ -1,5 +1,7 @@
 # Mini Ecommerce (Next.js)
 
+[![local CI](https://img.shields.io/badge/local%20CI-passing-brightgreen?logo=github-actions&logoColor=white)](.github/workflows/ci.yml) [![Vercel](https://img.shields.io/badge/deployed-Vercel-black?logo=vercel&logoColor=white)](https://mini-ecommerce-nextjs-psi.vercel.app/)
+
 A learning-focused ecommerce platform built with Next.js App Router. It demonstrates catalog and checkout flows, **Clerk authentication**, resilient API access, intentional rendering (SSG/ISR), and production-oriented patterns (tests, CI, observability).
 
 **Live:** [mini-ecommerce-nextjs-psi.vercel.app](https://mini-ecommerce-nextjs-psi.vercel.app)  
@@ -211,11 +213,10 @@ Details: [`docs/testing-strategy.md`](docs/testing-strategy.md)
 
 - **Challenge:** Model realistic ecommerce with auth, resilient APIs, and clear rendering choices.
 - **Approach:** Clerk for sessions; server-loaded catalog with client islands; typed HTTP layer; tests + CI + docs.
-- **Result:** A demo that reads as “junior with SaaS-style mechanics,” not only a UI exercise.
+- **Result:** A demo that reads as "junior with SaaS-style mechanics," not only a UI exercise.
 
 ## What I Would Improve Next
 
 - Clerk auth E2E with test users
 - Performance budgets and accessibility audit with before/after notes
 - Persistent order store (Redis/DB) for multi-instance deploys
-- README CI badges when GitHub Actions billing is active
