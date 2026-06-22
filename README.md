@@ -19,7 +19,7 @@ A learning-focused ecommerce platform built with Next.js App Router. It demonstr
 
 I wanted a project that goes beyond static UI and reflects real commerce behavior: dynamic catalog pages, cart/session handling, multi-step checkout, authenticated account areas, and API-backed interactions.
 
-The app showcases frontend-heavy product flows plus backend patterns (REST, GraphQL, Redis caching, WebSockets, Docker, and deployment scaffolding).
+The app showcases frontend-heavy product flows plus backend patterns (REST, GraphQL, **Postgres + Prisma**, Redis caching, WebSockets, Docker, and deployment scaffolding).
 
 ## My Role
 
@@ -40,7 +40,9 @@ The app showcases frontend-heavy product flows plus backend patterns (REST, Grap
 - **Clerk** (`@clerk/nextjs`) — OIDC sessions, protected routes
 - **Sentry** (`@sentry/nextjs`) — optional error monitoring
 - Node.js route handlers (REST + GraphQL)
-- Redis 5, WebSockets (`ws`)
+- **PostgreSQL (Neon)** + **Prisma** — orders (`Order`, `OrderItem`)
+- **Redis** — cart sessions and product cache
+- WebSockets (`ws`)
 - Vitest 4, Testing Library, Playwright
 - Docker / Docker Compose, GitHub Actions
 
@@ -54,7 +56,8 @@ mini-ecommerce/
 ├── src/app/context/      # Cart, orders, favorites, collections, messages, realtime
 ├── src/components/       # UI, ProductsCatalog, ProductDetailView, AccountMenu
 ├── src/hooks/            # useDebouncedValue, useAsyncResource, useApiMutation, …
-├── src/lib/              # http-client, api-client, product-data, order-store
+├── src/lib/              # http-client, api-client, product-data, order-store, prisma
+├── prisma/               # schema + migrations (orders)
 ├── src/proxy.ts          # Clerk clerkMiddleware + protected routes
 ├── docs/                 # Architecture, DoD, testing strategy
 ├── e2e/                  # Playwright specs
@@ -90,6 +93,27 @@ See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-l
 
 **Realtime** — `realtime-server.mjs` at `NEXT_PUBLIC_WS_URL` (default `ws://localhost:4001`)
 
+### Data persistence (Redis vs Postgres)
+
+Orders and cart data use **different stores on purpose** — each fits the access pattern:
+
+| Data | Store | Why |
+|------|-------|-----|
+| **Cart** (`/api/cart/[sessionId]`) | Redis (or in-memory `Map` without `REDIS_URL`) | Session-scoped, high-churn key/value; no relational queries needed |
+| **Product cache** (`/api/products`) | Redis | Short-lived catalog cache |
+| **Orders** (`/api/orders`, GraphQL `createOrder`) | **PostgreSQL via Prisma** | Relational `Order` + `OrderItem` rows; per-user history and admin queries |
+
+**Migration story:** v1 stored orders as Redis JSON blobs (`orders:user:{userId}`) for a fast demo. Phase 6 swapped the `order-store.ts` adapter to Prisma + Postgres on Neon **without changing the public API** — same REST/GraphQL surface, Clerk `userId` scoping unchanged. Cart stayed on Redis.
+
+**Production:** Neon (`neon-cerulean-curtain`) via Vercel Marketplace; pooled `DATABASE_URL` with `?pgbouncer=true`. Migrations run on deploy: `prisma migrate deploy && next build`.
+
+**Local options:** Docker Compose `postgres:16-alpine` service, or point `DATABASE_URL` at a Neon dev branch.
+
+```bash
+npm run db:migrate   # apply migrations
+npm run db:studio    # Prisma Studio (local)
+```
+
 ---
 
 ## Key Features
@@ -99,7 +123,7 @@ See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-l
 - **Clerk authentication** — sign-in/up, `UserButton`, protected account routes
 - Favorites, collections, messages (demo), and per-user order history
 - **HTTP resilience** — centralized client with timeout, retry, `AppError`, `ApiState<T>`
-- Dark mode, Open Graph metadata, REST + GraphQL, Redis + WebSocket demos
+- Dark mode, Open Graph metadata, REST + GraphQL, Redis cart cache + Postgres orders, WebSocket demos
 - **Observability** — Sentry (optional), `error.tsx`, `ErrorBoundary`, structured logs
 
 ---
@@ -128,7 +152,8 @@ See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-l
 | `SENTRY_AUTH_TOKEN` | No | Sentry upload token (builds) |
 | `NEXT_PUBLIC_API_BASE_URL` | No | API base override (empty = same origin) |
 | `NEXT_PUBLIC_WS_URL` | No | WebSocket URL (default `ws://localhost:4001`) |
-| `REDIS_URL` | No | Redis (default `redis://localhost:6379`) |
+| `REDIS_URL` | No | Redis for cart + product cache (default `redis://localhost:6379`; in-memory fallback if unset) |
+| `DATABASE_URL` | Yes (orders) | Postgres connection string — use Neon pooler URL in production (`?pgbouncer=true`) |
 
 ---
 
@@ -201,7 +226,8 @@ Details: [`docs/testing-strategy.md`](docs/testing-strategy.md)
 | --- | --- |
 | Auth buttons do nothing / Clerk errors | Keys in `.env.local`; restart `npm run dev` |
 | Redirect loop on account pages | Valid Clerk keys; routes `/sign-in`, `/sign-up` exist |
-| Orders empty after login | Sign in before checkout; orders are per Clerk `userId` |
+| Orders empty after login | Sign in before checkout; orders are per Clerk `userId` and stored in Postgres |
+| `DATABASE_URL` missing on Vercel | Set pooled Neon URL on Preview + Production; build runs `prisma migrate deploy` |
 | API timeout errors | Network tab; default 8s timeout in `http-client` |
 | Build fails on Vercel | Clerk env vars in Vercel project settings |
 | Sentry not receiving events | `NEXT_PUBLIC_SENTRY_DSN` set in env |
@@ -212,11 +238,11 @@ Details: [`docs/testing-strategy.md`](docs/testing-strategy.md)
 ## Case Study Highlights (Portfolio Use)
 
 - **Challenge:** Model realistic ecommerce with auth, resilient APIs, and clear rendering choices.
-- **Approach:** Clerk for sessions; server-loaded catalog with client islands; typed HTTP layer; tests + CI + docs.
-- **Result:** A demo that reads as "junior with SaaS-style mechanics," not only a UI exercise.
+- **Approach:** Clerk for sessions; server-loaded catalog with client islands; typed HTTP layer; **Prisma + Postgres for orders**, Redis for cart; tests + CI + docs.
+- **Result:** A demo that reads as "junior with SaaS-style mechanics," not only a UI exercise — including a live Postgres migration without breaking the API.
 
 ## What I Would Improve Next
 
 - Clerk auth E2E with test users
 - Performance budgets and accessibility audit with before/after notes
-- Persistent order store (Redis/DB) for multi-instance deploys
+- Portfolio case-study page with the Redis → Postgres migration narrative
