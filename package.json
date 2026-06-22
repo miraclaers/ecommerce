@@ -19,7 +19,7 @@
     "db:studio": "prisma studio",
     "dev": "next dev",
     "dev:realtime": "node realtime-server.mjs",
-    "build": "next build",
+    "build": "prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
