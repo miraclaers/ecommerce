@@ -4,9 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useOrders } from "@/app/context/OrdersContext";
 import { useCart } from "@/app/context/CartContext";
-import { fetchProducts } from "@/lib/api-client";
-import { useState } from "react";
-import type { Product } from "@/lib/types";
+import { computeOrderTotal } from "@/lib/order-pricing";
 import { useRealtime } from "@/app/context/RealtimeContext";
 
 export default function CheckoutSuccessPage() {
@@ -14,25 +12,22 @@ export default function CheckoutSuccessPage() {
   const { cart, clearCart } = useCart();
   const { sendEvent } = useRealtime();
   const hasSubmitted = useRef(false);
-  const [products, setProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    fetchProducts().then(setProducts).catch(() => setProducts([]));
-  }, []);
-
-  const productMap = new Map(products.map((product) => [product.id, product]));
-  const total = cart.reduce((acc, item) => {
-    const product = productMap.get(item.id);
-    if (!product) return acc;
-    return acc + product.price * item.quantity;
-  }, 0);
+  const total = computeOrderTotal(cart) ?? 0;
 
   useEffect(() => {
     if (hasSubmitted.current) return;
     if (cart.length === 0) return;
 
-    addOrder({ total, items: cart })
-      .then(async (created) => {
+    const items = cart.map((item) => ({ ...item }));
+    const orderTotal = computeOrderTotal(items);
+    if (orderTotal === null || orderTotal <= 0) return;
+
+    // Block duplicate submissions before the async API call resolves.
+    hasSubmitted.current = true;
+
+    void (async () => {
+      try {
+        const created = await addOrder({ total: orderTotal, items });
         await setOrderPaid(created.id);
         sendEvent({
           type: "order.status.paid",
@@ -41,15 +36,15 @@ export default function CheckoutSuccessPage() {
             total: created.total,
           },
         });
-      })
-      .catch(() => {
-        // Keep UX smooth in demo mode if API is unavailable.
-      })
-      .finally(() => {
+      } catch {
+        hasSubmitted.current = false;
+      } finally {
         clearCart();
-        hasSubmitted.current = true;
-      });
-  }, [addOrder, clearCart, total, cart, setOrderPaid, sendEvent]);
+      }
+    })();
+    // Submit once when the cart hydrates; hasSubmitted blocks effect re-runs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+  }, [cart.length]);
 
   return (
     <div className="p-8 max-w-lg mx-auto">
