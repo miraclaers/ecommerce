@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String
+  total     Decimal     @db.Decimal(10, 2)
+  status    String      @default("processing")
+  createdAt DateTime    @default(now())
+  items     OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}

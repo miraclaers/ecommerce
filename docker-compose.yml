@@ -26,3 +26,18 @@ services:
       - .:/app
     ports:
       - "4001:4001"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: mini-ecommerce-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mini_ecommerce
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
