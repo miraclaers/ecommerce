@@ -1,18 +1,128 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { OrderDraft } from "@/lib/types";
 
-const redisStore = vi.hoisted(() => new Map<string, string>());
+interface StoredOrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  quantity: number;
+}
 
-vi.mock("@/lib/redis", () => ({
-  getJson: async <T>(key: string): Promise<T | null> => {
-    const raw = redisStore.get(key);
-    if (!raw) {
-      return null;
-    }
-    return JSON.parse(raw) as T;
+interface StoredOrder {
+  id: string;
+  userId: string;
+  total: number;
+  status: string;
+  createdAt: Date;
+  items: StoredOrderItem[];
+}
+
+const prismaStore = vi.hoisted(() => ({
+  orders: [] as StoredOrder[],
+  reset() {
+    this.orders = [];
   },
-  setJson: async (key: string, value: unknown) => {
-    redisStore.set(key, JSON.stringify(value));
+}));
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    order: {
+      create: async ({
+        data,
+      }: {
+        data: {
+          userId: string;
+          total: number;
+          status?: string;
+          items: { create: Array<{ productId: string; quantity: number }> };
+        };
+      }) => {
+        const id = crypto.randomUUID();
+        const createdAt = new Date();
+        const items = data.items.create.map((item, index) => ({
+          id: `${id}-item-${index}`,
+          orderId: id,
+          productId: item.productId,
+          quantity: item.quantity,
+        }));
+        const order: StoredOrder = {
+          id,
+          userId: data.userId,
+          total: data.total,
+          status: data.status ?? "processing",
+          createdAt,
+          items,
+        };
+        prismaStore.orders.push(order);
+        return order;
+      },
+      findMany: async ({
+        where,
+        orderBy,
+      }: {
+        where?: { userId?: string };
+        orderBy?: { createdAt: "desc" };
+      }) => {
+        let results = [...prismaStore.orders];
+        if (where?.userId) {
+          results = results.filter((order) => order.userId === where.userId);
+        }
+        if (orderBy?.createdAt === "desc") {
+          results.sort((a, b) => {
+            const byDate = b.createdAt.getTime() - a.createdAt.getTime();
+            if (byDate !== 0) {
+              return byDate;
+            }
+            return (
+              prismaStore.orders.indexOf(b) - prismaStore.orders.indexOf(a)
+            );
+          });
+        }
+        return results.map((order) => ({
+          ...order,
+          items: order.items.map((item) => ({ ...item })),
+        }));
+      },
+      findFirst: async ({
+        where,
+      }: {
+        where?: { id?: string; userId?: string };
+      }) => {
+        const order = prismaStore.orders.find(
+          (candidate) =>
+            (!where?.id || candidate.id === where.id) &&
+            (!where?.userId || candidate.userId === where.userId)
+        );
+        if (!order) {
+          return null;
+        }
+        return {
+          ...order,
+          items: order.items.map((item) => ({ ...item })),
+        };
+      },
+      update: async ({
+        where,
+        data,
+      }: {
+        where: { id: string };
+        data: { status?: string };
+      }) => {
+        const order = prismaStore.orders.find(
+          (candidate) => candidate.id === where.id
+        );
+        if (!order) {
+          throw new Error(`Order not found: ${where.id}`);
+        }
+        if (data.status) {
+          order.status = data.status;
+        }
+        return {
+          ...order,
+          items: order.items.map((item) => ({ ...item })),
+        };
+      },
+    },
   },
 }));
 
@@ -30,7 +140,7 @@ const sampleDraft: OrderDraft = {
 
 describe("order-store", () => {
   beforeEach(() => {
-    redisStore.clear();
+    prismaStore.reset();
     vi.spyOn(crypto, "randomUUID").mockReturnValue("order-uuid-1");
   });
 

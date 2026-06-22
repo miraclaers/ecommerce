@@ -1,69 +1,77 @@
 import type { Order, OrderDraft } from "@/lib/types";
-import { getJson, setJson } from "@/lib/redis";
+import type { Order as PrismaOrder, OrderItem } from "@prisma/client";
+import { prisma } from "./prisma";
 
-const ORDERS_INDEX_KEY = "orders:users";
+type OrderWithItems = PrismaOrder & { items: OrderItem[] };
 
-function userOrdersKey(userId: string) {
-  return `orders:user:${userId}`;
-}
-
-async function getUserOrders(userId: string): Promise<Order[]> {
-  return (await getJson<Order[]>(userOrdersKey(userId))) ?? [];
-}
-
-async function saveUserOrders(userId: string, orders: Order[]): Promise<void> {
-  await setJson(userOrdersKey(userId), orders);
-
-  const index = (await getJson<string[]>(ORDERS_INDEX_KEY)) ?? [];
-  if (!index.includes(userId)) {
-    await setJson(ORDERS_INDEX_KEY, [...index, userId]);
-  }
+function mapOrder(record: OrderWithItems): Order {
+  return {
+    id: record.id,
+    userId: record.userId,
+    total: Number(record.total),
+    date: record.createdAt.toISOString(),
+    status: record.status as Order["status"],
+    items: record.items.map((item) => ({
+      id: item.productId,
+      quantity: item.quantity,
+    })),
+  };
 }
 
 export async function listOrders(userId: string): Promise<Order[]> {
-  return [...(await getUserOrders(userId))];
+  const records = await prisma.order.findMany({
+    where: { userId },
+    include: { items: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return records.map(mapOrder);
 }
 
 export async function createOrder(
   userId: string,
   input: OrderDraft
 ): Promise<Order> {
-  const nextOrder: Order = {
-    id: crypto.randomUUID(),
-    userId,
-    date: new Date().toISOString(),
-    status: "processing",
-    ...input,
-  };
-  const bucket = await getUserOrders(userId);
-  bucket.unshift(nextOrder);
-  await saveUserOrders(userId, bucket);
-  return nextOrder;
+  const record = await prisma.order.create({
+    data: {
+      userId,
+      total: input.total,
+      status: "processing",
+      items: {
+        create: input.items.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+        })),
+      },
+    },
+    include: { items: true },
+  });
+  return mapOrder(record);
 }
 
 export async function markOrderAsPaid(
   userId: string,
   orderId: string
 ): Promise<Order | undefined> {
-  const bucket = await getUserOrders(userId);
-  const target = bucket.find((order) => order.id === orderId);
-  if (!target) {
+  const existing = await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: { items: true },
+  });
+  if (!existing) {
     return undefined;
   }
-  target.status = "paid";
-  await saveUserOrders(userId, bucket);
-  return target;
+
+  const record = await prisma.order.update({
+    where: { id: orderId },
+    data: { status: "paid" },
+    include: { items: true },
+  });
+  return mapOrder(record);
 }
 
 export async function listAllOrders(): Promise<Order[]> {
-  const index = (await getJson<string[]>(ORDERS_INDEX_KEY)) ?? [];
-  const all: Order[] = [];
-
-  for (const userId of index) {
-    all.push(...(await getUserOrders(userId)));
-  }
-
-  return all.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const records = await prisma.order.findMany({
+    include: { items: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return records.map(mapOrder);
 }
