@@ -91,7 +91,7 @@ See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-l
 
 **GraphQL** — `POST /api/graphql` (products public; orders require auth)
 
-**Realtime** — `realtime-server.mjs` at `NEXT_PUBLIC_WS_URL` (default `ws://localhost:4001`)
+**Realtime** — `realtime-server.mjs` on port 4001. Override with `NEXT_PUBLIC_WS_URL`; otherwise the browser connects to `ws://<page-host>:4001` (works with Docker Compose port mapping).
 
 ### Data persistence (Redis vs Postgres)
 
@@ -151,7 +151,7 @@ npm run db:studio    # Prisma Studio (local)
 | `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry DSN (client + server) |
 | `SENTRY_AUTH_TOKEN` | No | Sentry upload token (builds) |
 | `NEXT_PUBLIC_API_BASE_URL` | No | API base override (empty = same origin) |
-| `NEXT_PUBLIC_WS_URL` | No | WebSocket URL (default `ws://localhost:4001`) |
+| `NEXT_PUBLIC_WS_URL` | No | WebSocket URL override; default is `ws://<page-host>:4001` in the browser |
 | `REDIS_URL` | No | Redis for cart + product cache (default `redis://localhost:6379`; in-memory fallback if unset) |
 | `DATABASE_URL` | Yes (orders) | Postgres connection string — use Neon pooler URL in production (`?pgbouncer=true`) |
 

@@ -38,7 +38,8 @@ export function RealtimeProvider({
 
   useEffect(() => {
     const wsUrl =
-      process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4001";
+      process.env.NEXT_PUBLIC_WS_URL ??
+      `ws://${window.location.hostname}:4001`;
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 

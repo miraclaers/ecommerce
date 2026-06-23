@@ -7,9 +7,9 @@ services:
       - "3000:3000"
     environment:
       REDIS_URL: redis://redis:6379
-      NEXT_PUBLIC_WS_URL: ws://localhost:4001
     depends_on:
       - redis
+      - realtime
 
   redis:
     image: redis:7-alpine
