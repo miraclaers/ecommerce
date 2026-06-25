@@ -25,6 +25,11 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ecommerce_test
+      # Real Clerk test-instance keys (set as repo secrets) so browser-based E2E
+      # passes Clerk's dev handshake. Falls back to placeholders when unset, which
+      # still satisfies lint/build and the request-only auth-guard specs.
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY || 'pk_test_Y2ktcGxhY2Vob2xkZXIuY2xlcmsuYWNjb3VudHMuZGV2JA' }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'sk_test_ci_placeholder' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,9 +44,6 @@ jobs:
         run: npm ci
 
       - name: Run lint
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2ktcGxhY2Vob2xkZXIuY2xlcmsuYWNjb3VudHMuZGV2JA
-          CLERK_SECRET_KEY: sk_test_ci_placeholder
         run: npm run lint
 
       - name: Run type-check
@@ -52,9 +54,6 @@ jobs:
 
       - name: Build app
         run: npm run build
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2ktcGxhY2Vob2xkZXIuY2xlcmsuYWNjb3VudHMuZGV2JA
-          CLERK_SECRET_KEY: sk_test_ci_placeholder
 
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
@@ -63,5 +62,3 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2ktcGxhY2Vob2xkZXIuY2xlcmsuYWNjb3VudHMuZGV2JA
-          CLERK_SECRET_KEY: sk_test_ci_placeholder
