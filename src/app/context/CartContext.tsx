@@ -55,6 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating persisted cart from localStorage on mount
         setCart(
           parsed.filter(
             (item: CartItem) =>

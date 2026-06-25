@@ -22,7 +22,7 @@ export function useAsyncResource<T>(
             );
         setState({ status: "error", error: appError });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- caller controls deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo -- caller controls deps
   }, deps);
 
   useEffect(() => {
