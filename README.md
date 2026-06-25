@@ -186,9 +186,7 @@ npm run ci:full     # above + Playwright E2E
 npm run test:e2e    # E2E only (starts production server)
 ```
 
-CI uses **placeholder** Clerk keys only — not your real secrets.
-
-> If GitHub Actions fails with a billing message, run `npm run ci` locally; the pipeline definition is still valid.
+CI runs the full pipeline on **GitHub Actions** (lint, type-check, Vitest, build, and Playwright E2E) on every push and pull request, against a Postgres service container. It uses Clerk **test** keys from repo secrets (`CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`), with placeholder fallback — never production secrets. The same checks run locally with the commands above.
 
 ### Tests
 
@@ -231,7 +229,7 @@ Details: [`docs/testing-strategy.md`](docs/testing-strategy.md)
 | API timeout errors | Network tab; default 8s timeout in `http-client` |
 | Build fails on Vercel | Clerk env vars in Vercel project settings |
 | Sentry not receiving events | `NEXT_PUBLIC_SENTRY_DSN` set in env |
-| GitHub Actions blocked | Account billing; use local `npm run ci` |
+| E2E fails with Clerk `host_invalid` | Set real Clerk **test** keys in `CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` repo secrets |
 
 ---
 
