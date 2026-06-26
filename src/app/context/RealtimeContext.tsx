@@ -37,10 +37,26 @@ export function RealtimeProvider({
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    const isSecurePage = window.location.protocol === "https:";
+
+    // Without an explicit URL we only attempt the local dev gateway over plain
+    // HTTP. Browsers forbid ws:// from an https:// page, so skip entirely there.
     const wsUrl =
       process.env.NEXT_PUBLIC_WS_URL ??
-      `ws://${window.location.hostname}:4001`;
-    const socket = new WebSocket(wsUrl);
+      (isSecurePage ? null : `ws://${window.location.hostname}:4001`);
+
+    if (!wsUrl) {
+      return;
+    }
+
+    let socket: WebSocket;
+    try {
+      socket = new WebSocket(wsUrl);
+    } catch {
+      // e.g. mixed-content (ws:// from https://) — fail silently instead of
+      // crashing the whole app.
+      return;
+    }
     socketRef.current = socket;
 
     socket.onopen = () => {
@@ -48,6 +64,10 @@ export function RealtimeProvider({
     };
 
     socket.onclose = () => {
+      setIsConnected(false);
+    };
+
+    socket.onerror = () => {
       setIsConnected(false);
     };
 
