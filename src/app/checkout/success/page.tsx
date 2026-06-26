@@ -36,7 +36,10 @@ export default function CheckoutSuccessPage() {
             total: created.total,
           },
         });
-      } catch {
+      } catch (error) {
+        // Surfaced so CI traces show if the order API is failing (e.g. 500
+        // under load) instead of silently allowing a retry on the next render.
+        console.error("[checkout/success] order submission failed", error);
         hasSubmitted.current = false;
       } finally {
         clearCart();

@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
 import { graphql, buildSchema } from "graphql";
+import { getUserIdSafe } from "@/lib/auth";
 import { listProducts, readProductById } from "@/lib/product-data";
 import { createOrder, listOrders } from "@/lib/order-store";
 import { validateGraphQLQuery } from "@/lib/graphql-guard";
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { userId } = await auth();
+  const userId = await getUserIdSafe();
 
   const rootValue = {
     products: () => listProducts(),

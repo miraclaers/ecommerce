@@ -70,7 +70,10 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     let created: Order;
     try {
       created = await createOrderWithGraphQL(order);
-    } catch {
+    } catch (error) {
+      // The flow stays usable offline/unauthenticated via the local fallback,
+      // but log first so a real API failure (e.g. 500 under CI load) is visible.
+      console.error("[orders] createOrder API failed, using local fallback", error);
       created = {
         id: crypto.randomUUID(),
         userId: "local",
@@ -88,8 +91,9 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     let updated: Order | null = null;
     try {
       updated = await markOrderPaid(orderId);
-    } catch {
-      // Fall back to local update.
+    } catch (error) {
+      // Fall back to local update, but log so a 500/timeout under load is visible.
+      console.error("[orders] markOrderPaid API failed, using local fallback", error);
     }
     setOrders((prev) =>
       prev.map((order) => {

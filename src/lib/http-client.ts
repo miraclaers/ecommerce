@@ -1,6 +1,6 @@
 import { AppError, fromResponse } from "@/lib/errors";
 
-const RETRYABLE_STATUSES = new Set([429, 502, 503]);
+const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
 const DEFAULT_TIMEOUT_MS = 8_000;
 const DEFAULT_MAX_RETRIES = 2;
 
