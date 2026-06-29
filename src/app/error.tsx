@@ -1,6 +1,5 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import Link from "next/link";
 
@@ -12,7 +11,9 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    void import("@sentry/nextjs").then((Sentry) =>
+      Sentry.captureException(error)
+    );
   }, [error]);
 
   return (

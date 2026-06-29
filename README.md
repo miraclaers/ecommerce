@@ -107,9 +107,23 @@ Orders and cart data use **different stores on purpose** — each fits the acces
 
 **Production:** Neon (`neon-cerulean-curtain`) via Vercel Marketplace; pooled `DATABASE_URL` with `?pgbouncer=true`. Migrations run on deploy: `prisma migrate deploy && next build`.
 
-**Local options:** Docker Compose `postgres:16-alpine` service, or point `DATABASE_URL` at a Neon dev branch.
+**Legacy data cutover:** the app no longer writes orders to Redis. A one-off script handles any leftover `orders:user:*` blobs from the v1 Redis store — optionally backfilling them into Postgres, then deleting the stale keys. It is dry-run by default and idempotent:
 
 ```bash
+npm run orders:migrate-legacy                 # dry run (report only)
+npm run orders:migrate-legacy -- --apply      # backfill to Postgres + delete Redis keys
+npm run orders:migrate-legacy -- --apply --skip-backfill   # delete keys only
+npm run orders:migrate-legacy -- --apply --keep-redis      # backfill only
+```
+
+**Local options (pick one):**
+
+- **A — Docker Compose:** `docker compose up postgres` starts the `postgres:16-alpine` service; use `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mini_ecommerce`.
+- **B — Prisma local Postgres (no Docker):** `npx prisma dev` starts a local Prisma Postgres instance and prints a `prisma+postgres://...` URL — copy it into `DATABASE_URL` in `.env.local`, then run `npm run db:migrate` in a second terminal.
+- **C — Neon dev branch:** point `DATABASE_URL` at a Neon branch connection string.
+
+```bash
+npx prisma dev      # option B: start a local Prisma Postgres (keep running)
 npm run db:migrate   # apply migrations
 npm run db:studio    # Prisma Studio (local)
 ```

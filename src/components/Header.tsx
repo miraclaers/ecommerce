@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
-import AccountMenu from "@/components/AccountMenu";
+
+// Defer the account menu (and the Clerk client UI it pulls in — UserButton,
+// SignIn/SignUp modals, useUser/useClerk) into its own async chunk so it does
+// not weigh down the header on first load. A fixed-size placeholder reserves
+// space to avoid layout shift while it hydrates.
+const AccountMenu = dynamic(() => import("@/components/AccountMenu"), {
+  ssr: false,
+  loading: () => <div className="h-10 w-10 shrink-0" aria-hidden />,
+});
 
 const THEME_KEY = "minishop-theme";
 

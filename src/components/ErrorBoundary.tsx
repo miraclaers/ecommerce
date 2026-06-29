@@ -1,6 +1,5 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 type Props = {
@@ -20,7 +19,13 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });
+    // Load Sentry lazily so the monitoring SDK stays out of the happy-path
+    // bundle and is only fetched when an error actually needs reporting.
+    void import("@sentry/nextjs").then((Sentry) => {
+      Sentry.captureException(error, {
+        extra: { componentStack: errorInfo.componentStack },
+      });
+    });
   }
 
   render() {
