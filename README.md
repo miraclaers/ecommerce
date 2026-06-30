@@ -202,6 +202,8 @@ npm run test:e2e    # E2E only (starts production server)
 
 CI runs the full pipeline on **GitHub Actions** (lint, type-check, Vitest, build, and Playwright E2E) on every push and pull request, against a Postgres service container. It uses Clerk **test** keys from repo secrets (`CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`), with placeholder fallback — never production secrets. The same checks run locally with the commands above.
 
+`main` is protected: the `quality-checks` job is a **required status check**, so a pull request cannot be merged until CI is green.
+
 ### Tests
 
 | Area | Files |
@@ -227,7 +229,7 @@ Details: [`docs/testing-strategy.md`](docs/testing-strategy.md)
 
 ## Deployment
 
-- **Vercel:** primary live URL (configure Clerk + optional Sentry env vars in the dashboard).
+- **Vercel:** primary live URL (configure Clerk + optional Sentry env vars in the dashboard). Every pull request gets an automatic **preview deployment** via the Vercel ↔ GitHub integration; pushes to `main` deploy to production. The build runs `prisma migrate deploy` on production/CI/local builds but **skips migrations on Preview builds** (`VERCEL_ENV=preview`) — see `scripts/build.mjs`.
 - **AWS ECS:** `.github/workflows/deploy-aws.yml`, `aws/task-definition.json`, `aws/deploy.md`.
 
 ---

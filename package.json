@@ -20,7 +20,7 @@
     "orders:migrate-legacy": "node scripts/migrate-legacy-orders.mjs",
     "dev": "next dev",
     "dev:realtime": "node realtime-server.mjs",
-    "build": "prisma migrate deploy && next build",
+    "build": "node scripts/build.mjs",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
