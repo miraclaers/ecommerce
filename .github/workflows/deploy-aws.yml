@@ -8,6 +8,8 @@ on:
 
 jobs:
   deploy:
+    # Vercel is the primary deploy target; skip when AWS vars/secrets are unset.
+    if: vars.AWS_REGION != '' && vars.ECR_REPOSITORY != '' && vars.ECS_CLUSTER != '' && secrets.AWS_ROLE_TO_ASSUME != ''
     runs-on: ubuntu-latest
     permissions:
       id-token: write
