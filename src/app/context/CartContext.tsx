@@ -8,7 +8,8 @@ import {
   useRef,
   ReactNode,
 } from "react";
-import { fetchRemoteCart, syncRemoteCart } from "../../lib/api-client";
+import { fetchRemoteCart } from "../../lib/api-client";
+import { syncCartAction } from "@/app/actions/cart";
 import type { CartItem } from "@/lib/types";
 
 import {
@@ -86,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!hasLoaded.current) return;
     localStorage.setItem(storageKey, JSON.stringify(cart));
     if (!cartSessionRef.current) return;
-    syncRemoteCart(cartSessionRef.current, cart).catch(() => {
+    syncCartAction(cartSessionRef.current, cart).catch(() => {
       // Demo mode fallback.
     });
   }, [cart]);

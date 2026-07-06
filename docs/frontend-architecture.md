@@ -17,9 +17,22 @@
 ```text
 Server (product-data.ts) ──► Products page / PDP (SSG+ISR)
 Client contexts ──► Cart, favorites, collections (local + API)
+Cart sync (write) ──► syncCartAction (Server Action) ──► cart-store ──► Redis
+Cart hydrate (read) ──► GET /api/cart/[sessionId]
 Clerk session ──► proxy.ts (clerkMiddleware) ──► /api/orders scoped by userId
 http-client ──► timeout, retry, typed AppError ──► api-client
 ```
+
+## Server Actions
+
+One mutation runs as a **Server Action** (Roadmap keyword; keeps cart writes on the server without a client `fetch`):
+
+| Action | File | Called from | Backend |
+| --- | --- | --- | --- |
+| `syncCartAction(sessionId, items)` | `src/app/actions/cart.ts` | `CartContext` on cart change | `cart-store.ts` → Redis |
+
+`cart-store.ts` is shared with `PUT /api/cart/[sessionId]` so REST and the action stay in sync. Reads still use the GET route on mount for hydration.
+
 
 ## Auth
 

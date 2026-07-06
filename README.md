@@ -66,7 +66,20 @@ mini-ecommerce/
 └── .github/workflows/    # CI (+ optional AWS deploy)
 ```
 
-See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-level rendering decisions.
+See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-level rendering decisions and the Server Action cart sync flow.
+
+### Server Actions
+
+Cart writes use a **Server Action** instead of a client `fetch` to the REST route:
+
+```text
+CartContext (client) ──► syncCartAction() ──► cart-store.ts ──► Redis
+```
+
+- **Action:** [`src/app/actions/cart.ts`](src/app/actions/cart.ts) — `syncCartAction(sessionId, items)`
+- **Shared logic:** [`src/lib/cart-store.ts`](src/lib/cart-store.ts) — also used by `GET|PUT /api/cart/[sessionId]` for tests and external callers
+- **Reads:** still `GET /api/cart/[sessionId]` via `fetchRemoteCart` on mount (hydration from Redis)
+
 
 ### Routes (UI)
 
@@ -87,7 +100,7 @@ See [`docs/frontend-architecture.md`](docs/frontend-architecture.md) for route-l
 
 - `GET /api/products`, `GET /api/products/[id]`
 - `GET|POST|PATCH /api/orders` — requires Clerk session; scoped by `userId`
-- `GET|PUT /api/cart/[sessionId]`
+- `GET|PUT /api/cart/[sessionId]` — REST surface; **client cart sync uses Server Action** (`syncCartAction`) instead of `PUT`
 
 **GraphQL** — `POST /api/graphql` (products public; orders require auth)
 
@@ -209,6 +222,7 @@ CI runs the full pipeline on **GitHub Actions** (lint, type-check, Vitest, build
 | Area | Files |
 |------|--------|
 | Cart logic | `src/lib/cart-logic.test.ts` |
+| Cart persistence | `src/lib/cart-store.test.ts` |
 | Cart context | `src/app/context/cart-context.integration.test.tsx` |
 | HTTP client | `src/lib/http-client.test.ts` |
 | Hooks | `src/hooks/useDebouncedValue.test.ts` |

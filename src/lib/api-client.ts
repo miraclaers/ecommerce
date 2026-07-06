@@ -46,6 +46,7 @@ export async function fetchRemoteCart(
   return payload.data;
 }
 
+/** REST cart sync — used by tests and external callers; client UI uses `syncCartAction`. */
 export async function syncRemoteCart(
   sessionId: string,
   items: CartItem[]
