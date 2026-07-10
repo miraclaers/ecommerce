@@ -1,15 +1,41 @@
 import { NextResponse } from "next/server";
 import { getUserIdSafe } from "@/lib/auth";
-import { createOrder, listOrders, markOrderAsPaid } from "@/lib/order-store";
+import {
+  createOrder,
+  createOrderWithIdempotency,
+  findOrderByStripeSessionId,
+  listOrders,
+  markOrderAsPaid,
+} from "@/lib/order-store";
 import { log } from "@/lib/logger";
 import { computeOrderTotal } from "@/lib/order-pricing";
 import type { OrderDraft } from "@/lib/types";
-import { isValidCart, isValidOrderId, isValidTotal } from "@/lib/validate";
+import {
+  isValidCart,
+  isValidIdempotencyKey,
+  isValidOrderId,
+  isValidTotal,
+} from "@/lib/validate";
 
-export async function GET() {
+export async function GET(request: Request) {
   const userId = await getUserIdSafe();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const sessionId = new URL(request.url).searchParams.get("session_id");
+  if (sessionId) {
+    if (sessionId.length < 8 || sessionId.length > 255) {
+      return NextResponse.json(
+        { error: "Invalid session id" },
+        { status: 400 }
+      );
+    }
+    const order = await findOrderByStripeSessionId(userId, sessionId);
+    if (!order) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+    return NextResponse.json({ data: order });
   }
 
   return NextResponse.json({ data: await listOrders(userId) });
@@ -22,6 +48,14 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json()) as Partial<OrderDraft>;
+  const idempotencyKey = request.headers.get("Idempotency-Key")?.trim() ?? null;
+
+  if (idempotencyKey !== null && !isValidIdempotencyKey(idempotencyKey)) {
+    return NextResponse.json(
+      { error: "Invalid Idempotency-Key header" },
+      { status: 400 }
+    );
+  }
 
   if (!isValidCart(body.items)) {
     return NextResponse.json(
@@ -45,11 +79,27 @@ export async function POST(request: Request) {
     );
   }
 
+  const draft: OrderDraft = {
+    total: verifiedTotal,
+    items: body.items,
+  };
+
   try {
-    const order = await createOrder(userId, {
-      total: verifiedTotal,
-      items: body.items,
-    });
+    if (idempotencyKey) {
+      const { order, created } = await createOrderWithIdempotency(
+        userId,
+        draft,
+        idempotencyKey
+      );
+      log("info", created ? "order.created" : "order.idempotent_replay", {
+        userId,
+        orderId: order.id,
+        idempotencyKey,
+      });
+      return NextResponse.json({ data: order }, { status: created ? 201 : 200 });
+    }
+
+    const order = await createOrder(userId, draft);
     log("info", "order.created", { userId, orderId: order.id });
     return NextResponse.json({ data: order }, { status: 201 });
   } catch (error) {

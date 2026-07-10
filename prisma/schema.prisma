@@ -8,12 +8,15 @@ datasource db {
 }
 
 model Order {
-  id        String      @id @default(uuid())
-  userId    String
-  total     Decimal     @db.Decimal(10, 2)
-  status    String      @default("processing")
-  createdAt DateTime    @default(now())
-  items     OrderItem[]
+  id              String             @id @default(uuid())
+  userId          String
+  total           Decimal            @db.Decimal(10, 2)
+  status          String             @default("processing")
+  stripeSessionId String?            @unique
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  items           OrderItem[]
+  idempotency     IdempotencyRecord?
 
   @@index([userId])
 }
@@ -24,4 +27,16 @@ model OrderItem {
   productId String
   quantity  Int
   order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model IdempotencyRecord {
+  id        String   @id @default(uuid())
+  key       String
+  userId    String
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, key])
+  @@index([createdAt])
 }

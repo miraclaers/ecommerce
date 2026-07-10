@@ -23,6 +23,7 @@ export interface Order {
   date: string;
   items: CartItem[];
   status?: "processing" | "paid";
+  stripeSessionId?: string;
 }
 
 export type OrderDraft = {

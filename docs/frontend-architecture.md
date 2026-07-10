@@ -20,6 +20,8 @@ Client contexts ──► Cart, favorites, collections (local + API)
 Cart sync (write) ──► syncCartAction (Server Action) ──► cart-store ──► Redis
 Cart hydrate (read) ──► GET /api/cart/[sessionId]
 Clerk session ──► proxy.ts (clerkMiddleware) ──► /api/orders scoped by userId
+Stripe webhook ──► /api/webhooks/stripe (signature) ──► paid Order (idempotent on stripeSessionId)
+Checkout success ──► Idempotency-Key on POST /api/orders (demo path) or poll ?session_id= (Stripe)
 http-client ──► timeout, retry, typed AppError ──► api-client
 ```
 

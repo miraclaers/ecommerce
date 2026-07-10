@@ -1,12 +1,13 @@
 import { graphql, buildSchema } from "graphql";
 import { getUserIdSafe } from "@/lib/auth";
 import { listProducts, readProductById } from "@/lib/product-data";
-import { createOrder, listOrders } from "@/lib/order-store";
+import { createOrder, createOrderWithIdempotency, listOrders } from "@/lib/order-store";
 import { validateGraphQLQuery } from "@/lib/graphql-guard";
 import { computeOrderTotal } from "@/lib/order-pricing";
 import type { CartItem } from "@/lib/types";
 import {
   isValidCart,
+  isValidIdempotencyKey,
   isValidProductId,
   isValidTotal,
 } from "@/lib/validate";
@@ -50,7 +51,7 @@ const schema = buildSchema(`
   }
 
   type Mutation {
-    createOrder(total: Float!, items: [CartItemInput!]!): Order!
+    createOrder(total: Float!, items: [CartItemInput!]!, idempotencyKey: String): Order!
   }
 `);
 
@@ -59,6 +60,8 @@ export async function POST(request: Request) {
     query?: string;
     variables?: Record<string, unknown>;
   };
+  const headerIdempotencyKey =
+    request.headers.get("Idempotency-Key")?.trim() ?? null;
 
   if (!body.query) {
     return Response.json(
@@ -89,9 +92,11 @@ export async function POST(request: Request) {
     createOrder: async ({
       total,
       items,
+      idempotencyKey,
     }: {
       total: number;
       items: CartItem[];
+      idempotencyKey?: string | null;
     }) => {
       if (!userId) {
         throw new Error("Unauthorized");
@@ -106,6 +111,22 @@ export async function POST(request: Request) {
       }
       if (total !== verifiedTotal) {
         throw new Error("Order total does not match catalog prices");
+      }
+
+      const key =
+        (typeof idempotencyKey === "string" && idempotencyKey.trim()) ||
+        headerIdempotencyKey;
+
+      if (key) {
+        if (!isValidIdempotencyKey(key)) {
+          throw new Error("Invalid Idempotency-Key");
+        }
+        const { order } = await createOrderWithIdempotency(
+          userId,
+          { total: verifiedTotal, items },
+          key
+        );
+        return order;
       }
 
       return createOrder(userId, { total: verifiedTotal, items });

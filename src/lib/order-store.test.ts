@@ -1,133 +1,232 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { OrderDraft } from "@/lib/types";
 
-interface StoredOrderItem {
-  id: string;
-  orderId: string;
-  productId: string;
-  quantity: number;
-}
+const prismaStore = vi.hoisted(() => {
+  type StoredOrderItem = {
+    id: string;
+    orderId: string;
+    productId: string;
+    quantity: number;
+  };
 
-interface StoredOrder {
-  id: string;
-  userId: string;
-  total: number;
-  status: string;
-  createdAt: Date;
-  items: StoredOrderItem[];
-}
+  type StoredOrder = {
+    id: string;
+    userId: string;
+    total: number;
+    status: string;
+    stripeSessionId: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    items: StoredOrderItem[];
+  };
 
-const prismaStore = vi.hoisted(() => ({
-  orders: [] as StoredOrder[],
-  reset() {
-    this.orders = [];
-  },
-}));
+  type StoredIdempotency = {
+    id: string;
+    key: string;
+    userId: string;
+    orderId: string;
+    createdAt: Date;
+  };
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    order: {
-      create: async ({
-        data,
-      }: {
-        data: {
-          userId: string;
-          total: number;
-          status?: string;
-          items: { create: Array<{ productId: string; quantity: number }> };
-        };
-      }) => {
-        const id = crypto.randomUUID();
-        const createdAt = new Date();
-        const items = data.items.create.map((item, index) => ({
-          id: `${id}-item-${index}`,
-          orderId: id,
-          productId: item.productId,
-          quantity: item.quantity,
-        }));
-        const order: StoredOrder = {
-          id,
-          userId: data.userId,
-          total: data.total,
-          status: data.status ?? "processing",
-          createdAt,
-          items,
-        };
-        prismaStore.orders.push(order);
-        return order;
-      },
-      findMany: async ({
-        where,
-        orderBy,
-      }: {
-        where?: { userId?: string };
-        orderBy?: { createdAt: "desc" };
-      }) => {
-        let results = [...prismaStore.orders];
-        if (where?.userId) {
-          results = results.filter((order) => order.userId === where.userId);
-        }
-        if (orderBy?.createdAt === "desc") {
-          results.sort((a, b) => {
-            const byDate = b.createdAt.getTime() - a.createdAt.getTime();
-            if (byDate !== 0) {
-              return byDate;
-            }
-            return (
-              prismaStore.orders.indexOf(b) - prismaStore.orders.indexOf(a)
-            );
-          });
-        }
-        return results.map((order) => ({
-          ...order,
-          items: order.items.map((item) => ({ ...item })),
-        }));
-      },
-      findFirst: async ({
-        where,
-      }: {
-        where?: { id?: string; userId?: string };
-      }) => {
-        const order = prismaStore.orders.find(
-          (candidate) =>
-            (!where?.id || candidate.id === where.id) &&
-            (!where?.userId || candidate.userId === where.userId)
-        );
-        if (!order) {
-          return null;
-        }
-        return {
-          ...order,
-          items: order.items.map((item) => ({ ...item })),
-        };
-      },
-      update: async ({
-        where,
-        data,
-      }: {
-        where: { id: string };
-        data: { status?: string };
-      }) => {
-        const order = prismaStore.orders.find(
-          (candidate) => candidate.id === where.id
-        );
-        if (!order) {
-          throw new Error(`Order not found: ${where.id}`);
-        }
-        if (data.status) {
-          order.status = data.status;
-        }
-        return {
-          ...order,
-          items: order.items.map((item) => ({ ...item })),
-        };
-      },
+  return {
+    orders: [] as StoredOrder[],
+    idempotency: [] as StoredIdempotency[],
+    reset() {
+      this.orders = [];
+      this.idempotency = [];
     },
-  },
-}));
+    createOrderRecord(data: {
+      userId: string;
+      total: number;
+      status?: string;
+      stripeSessionId?: string | null;
+      items: { create: Array<{ productId: string; quantity: number }> };
+    }): StoredOrder {
+      const id = crypto.randomUUID();
+      const createdAt = new Date();
+      const items = data.items.create.map((item, index) => ({
+        id: `${id}-item-${index}`,
+        orderId: id,
+        productId: item.productId,
+        quantity: item.quantity,
+      }));
+      const order: StoredOrder = {
+        id,
+        userId: data.userId,
+        total: data.total,
+        status: data.status ?? "processing",
+        stripeSessionId: data.stripeSessionId ?? null,
+        createdAt,
+        updatedAt: createdAt,
+        items,
+      };
+      this.orders.push(order);
+      return order;
+    },
+  };
+});
+
+vi.mock("@/lib/prisma", () => {
+  const orderApi = {
+    create: async ({
+      data,
+    }: {
+      data: {
+        userId: string;
+        total: number;
+        status?: string;
+        stripeSessionId?: string | null;
+        items: { create: Array<{ productId: string; quantity: number }> };
+      };
+    }) => prismaStore.createOrderRecord(data),
+    findMany: async ({
+      where,
+      orderBy,
+    }: {
+      where?: { userId?: string };
+      orderBy?: { createdAt: "desc" };
+    }) => {
+      let results = [...prismaStore.orders];
+      if (where?.userId) {
+        results = results.filter((order) => order.userId === where.userId);
+      }
+      if (orderBy?.createdAt === "desc") {
+        results.sort((a, b) => {
+          const byDate = b.createdAt.getTime() - a.createdAt.getTime();
+          if (byDate !== 0) {
+            return byDate;
+          }
+          return prismaStore.orders.indexOf(b) - prismaStore.orders.indexOf(a);
+        });
+      }
+      return results.map((order) => ({
+        ...order,
+        items: order.items.map((item) => ({ ...item })),
+      }));
+    },
+    findFirst: async ({
+      where,
+    }: {
+      where?: { id?: string; userId?: string; stripeSessionId?: string };
+    }) => {
+      const order = prismaStore.orders.find(
+        (candidate) =>
+          (!where?.id || candidate.id === where.id) &&
+          (!where?.userId || candidate.userId === where.userId) &&
+          (!where?.stripeSessionId ||
+            candidate.stripeSessionId === where.stripeSessionId)
+      );
+      if (!order) {
+        return null;
+      }
+      return {
+        ...order,
+        items: order.items.map((item) => ({ ...item })),
+      };
+    },
+    findUnique: async ({
+      where,
+    }: {
+      where: { stripeSessionId?: string };
+    }) => {
+      const order = prismaStore.orders.find(
+        (candidate) =>
+          where.stripeSessionId !== undefined &&
+          candidate.stripeSessionId === where.stripeSessionId
+      );
+      if (!order) {
+        return null;
+      }
+      return {
+        ...order,
+        items: order.items.map((item) => ({ ...item })),
+      };
+    },
+    update: async ({
+      where,
+      data,
+    }: {
+      where: { id: string };
+      data: { status?: string };
+    }) => {
+      const order = prismaStore.orders.find(
+        (candidate) => candidate.id === where.id
+      );
+      if (!order) {
+        throw new Error(`Order not found: ${where.id}`);
+      }
+      if (data.status) {
+        order.status = data.status;
+      }
+      return {
+        ...order,
+        items: order.items.map((item) => ({ ...item })),
+      };
+    },
+  };
+
+  const idempotencyApi = {
+    findUnique: async ({
+      where,
+    }: {
+      where: { userId_key: { userId: string; key: string } };
+    }) => {
+      const record = prismaStore.idempotency.find(
+        (row) =>
+          row.userId === where.userId_key.userId &&
+          row.key === where.userId_key.key
+      );
+      if (!record) {
+        return null;
+      }
+      const order = prismaStore.orders.find((o) => o.id === record.orderId);
+      if (!order) {
+        return null;
+      }
+      return {
+        ...record,
+        order: {
+          ...order,
+          items: order.items.map((item) => ({ ...item })),
+        },
+      };
+    },
+    create: async ({
+      data,
+    }: {
+      data: { key: string; userId: string; orderId: string };
+    }) => {
+      const record = {
+        id: crypto.randomUUID(),
+        key: data.key,
+        userId: data.userId,
+        orderId: data.orderId,
+        createdAt: new Date(),
+      };
+      prismaStore.idempotency.push(record);
+      return record;
+    },
+  };
+
+  return {
+    prisma: {
+      order: orderApi,
+      idempotencyRecord: idempotencyApi,
+      $transaction: async <T>(
+        fn: (tx: {
+          order: typeof orderApi;
+          idempotencyRecord: typeof idempotencyApi;
+        }) => Promise<T>
+      ) => fn({ order: orderApi, idempotencyRecord: idempotencyApi }),
+    },
+  };
+});
 
 import {
   createOrder,
+  createOrderWithIdempotency,
+  createPaidOrderFromStripe,
+  findOrderByStripeSessionId,
   listAllOrders,
   listOrders,
   markOrderAsPaid,
@@ -173,6 +272,65 @@ describe("order-store", () => {
 
       const orders = await listOrders("user-a");
       expect(orders.map((order) => order.id)).toEqual(["order-2", "order-1"]);
+    });
+  });
+
+  describe("createOrderWithIdempotency", () => {
+    it("creates once and replays the same order for the same key", async () => {
+      vi.spyOn(crypto, "randomUUID")
+        .mockReturnValueOnce("order-1")
+        .mockReturnValueOnce("idem-1");
+
+      const first = await createOrderWithIdempotency(
+        "user-a",
+        sampleDraft,
+        "key-checkout-1"
+      );
+      const second = await createOrderWithIdempotency(
+        "user-a",
+        sampleDraft,
+        "key-checkout-1"
+      );
+
+      expect(first.created).toBe(true);
+      expect(second.created).toBe(false);
+      expect(second.order.id).toBe(first.order.id);
+      expect(prismaStore.orders).toHaveLength(1);
+    });
+  });
+
+  describe("createPaidOrderFromStripe", () => {
+    it("creates a paid order keyed by stripe session id", async () => {
+      const result = await createPaidOrderFromStripe(
+        "user-a",
+        sampleDraft,
+        "cs_test_123"
+      );
+
+      expect(result.created).toBe(true);
+      expect(result.order).toMatchObject({
+        status: "paid",
+        stripeSessionId: "cs_test_123",
+      });
+
+      const replay = await createPaidOrderFromStripe(
+        "user-a",
+        sampleDraft,
+        "cs_test_123"
+      );
+      expect(replay.created).toBe(false);
+      expect(replay.order.id).toBe(result.order.id);
+    });
+
+    it("finds the order by stripe session for the owning user", async () => {
+      await createPaidOrderFromStripe("user-a", sampleDraft, "cs_test_abc");
+
+      await expect(
+        findOrderByStripeSessionId("user-a", "cs_test_abc")
+      ).resolves.toMatchObject({ stripeSessionId: "cs_test_abc" });
+      await expect(
+        findOrderByStripeSessionId("user-b", "cs_test_abc")
+      ).resolves.toBeUndefined();
     });
   });
 

@@ -21,10 +21,25 @@ export async function fetchOrders(): Promise<Order[]> {
   return payload.data;
 }
 
-export async function postOrder(order: OrderDraft): Promise<Order> {
+export async function fetchOrderByStripeSession(
+  sessionId: string
+): Promise<Order> {
+  const payload = await request<{ data: Order }>(
+    `${baseUrl}/api/orders?session_id=${encodeURIComponent(sessionId)}`
+  );
+  return payload.data;
+}
+
+export async function postOrder(
+  order: OrderDraft,
+  idempotencyKey?: string
+): Promise<Order> {
   const payload = await request<{ data: Order }>(`${baseUrl}/api/orders`, {
     method: "POST",
     body: order,
+    headers: idempotencyKey
+      ? { "Idempotency-Key": idempotencyKey }
+      : undefined,
   });
   return payload.data;
 }

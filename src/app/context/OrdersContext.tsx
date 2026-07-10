@@ -1,16 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  createOrderWithGraphQL,
-  fetchOrders,
-  markOrderPaid,
-} from "@/lib/api-client";
+import { fetchOrders, markOrderPaid, postOrder } from "@/lib/api-client";
 import type { Order, OrderDraft } from "@/lib/types";
 
 interface OrdersContextType {
   orders: Order[];
-  addOrder: (order: OrderDraft) => Promise<Order>;
+  addOrder: (order: OrderDraft, idempotencyKey?: string) => Promise<Order>;
   setOrderPaid: (orderId: string) => Promise<void>;
 }
 
@@ -66,10 +62,10 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     window.localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
   }, [orders]);
 
-  const addOrder = async (order: OrderDraft) => {
+  const addOrder = async (order: OrderDraft, idempotencyKey?: string) => {
     let created: Order;
     try {
-      created = await createOrderWithGraphQL(order);
+      created = await postOrder(order, idempotencyKey);
     } catch (error) {
       // The flow stays usable offline/unauthenticated via the local fallback,
       // but log first so a real API failure (e.g. 500 under CI load) is visible.
@@ -83,7 +79,12 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         status: "processing",
       };
     }
-    setOrders((prev) => [created, ...prev]);
+    setOrders((prev) => {
+      if (prev.some((existing) => existing.id === created.id)) {
+        return prev;
+      }
+      return [created, ...prev];
+    });
     return created;
   };
 
