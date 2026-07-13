@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useOrders } from "@/app/context/OrdersContext";
 import { fetchProducts } from "@/lib/api-client";
 import ApiStatusBanner from "@/components/ApiStatusBanner";
 import { useAsyncResource } from "@/hooks/useAsyncResource";
-import type { Product } from "@/lib/types";
+import type { Order, Product } from "@/lib/types";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", {
@@ -21,6 +21,48 @@ function formatDate(date: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(date));
+}
+
+function statusBadgeClass(status: Order["status"]) {
+  if (status === "paid") {
+    return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
+  }
+  if (status === "cancelled") {
+    return "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
+  }
+  return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300";
+}
+
+function CancelOrderButton({ orderId }: { orderId: string }) {
+  const { cancelOrder } = useOrders();
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <div className="mt-3 flex flex-col items-start gap-1">
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => {
+          setError(null);
+          startTransition(async () => {
+            const result = await cancelOrder(orderId);
+            if (!result.ok) {
+              setError(result.error);
+            }
+          });
+        }}
+        className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+      >
+        {pending ? "Cancelling…" : "Cancel order"}
+      </button>
+      {error ? (
+        <p className="text-xs text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 export default function MyPurchasesPage() {
@@ -92,11 +134,9 @@ export default function MyPurchasesPage() {
                   {formatCurrency(order.total)}
                 </p>
                 <span
-                  className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                    order.status === "paid"
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                      : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                  }`}
+                  className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusBadgeClass(
+                    order.status
+                  )}`}
                 >
                   {order.status ?? "processing"}
                 </span>
@@ -123,6 +163,10 @@ export default function MyPurchasesPage() {
                 );
               })}
             </ul>
+
+            {(order.status ?? "processing") === "processing" ? (
+              <CancelOrderButton orderId={order.id} />
+            ) : null}
           </li>
         ))}
       </ul>

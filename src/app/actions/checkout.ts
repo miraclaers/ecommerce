@@ -1,7 +1,7 @@
 "use server";
 
 import { getUserIdSafe } from "@/lib/auth";
-import { computeOrderTotal } from "@/lib/order-pricing";
+import { computeOrderTotal, validateCartStock } from "@/lib/order-pricing";
 import { readProductById } from "@/lib/product-data";
 import { getAppUrl, getStripe, isStripeConfigured } from "@/lib/stripe";
 import type { CartItem } from "@/lib/types";
@@ -30,6 +30,11 @@ export async function createCheckoutSessionAction(
 
   if (!isValidCart(items) || items.length === 0) {
     return { ok: false, error: "Cart is empty or invalid" };
+  }
+
+  const stock = validateCartStock(items);
+  if (!stock.ok) {
+    return { ok: false, error: stock.error };
   }
 
   const total = computeOrderTotal(items);

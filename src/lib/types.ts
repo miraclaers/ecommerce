@@ -8,6 +8,7 @@ export interface Product {
   createdAt: string;
   popularity: number;
   rating: number;
+  stock: number;
   discountPercent?: number;
 }
 
@@ -22,7 +23,7 @@ export interface Order {
   total: number;
   date: string;
   items: CartItem[];
-  status?: "processing" | "paid";
+  status?: "processing" | "paid" | "cancelled";
   stripeSessionId?: string;
 }
 

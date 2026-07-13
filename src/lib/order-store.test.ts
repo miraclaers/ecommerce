@@ -223,6 +223,7 @@ vi.mock("@/lib/prisma", () => {
 });
 
 import {
+  cancelOrder,
   createOrder,
   createOrderWithIdempotency,
   createPaidOrderFromStripe,
@@ -392,6 +393,68 @@ describe("order-store", () => {
 
       const orders = await listOrders("user-a");
       expect(orders[0]?.status).toBe("processing");
+    });
+
+    it("returns undefined when the order was already cancelled", async () => {
+      const created = await createOrder("user-a", sampleDraft);
+      await cancelOrder("user-a", created.id);
+
+      await expect(markOrderAsPaid("user-a", created.id)).resolves.toBeUndefined();
+    });
+  });
+
+  describe("cancelOrder", () => {
+    it("cancels a processing order owned by the user", async () => {
+      const created = await createOrder("user-a", sampleDraft);
+
+      const result = await cancelOrder("user-a", created.id);
+
+      expect(result).toEqual({
+        ok: true,
+        order: expect.objectContaining({
+          id: created.id,
+          status: "cancelled",
+        }),
+      });
+
+      const listed = await listOrders("user-a");
+      expect(listed[0]?.status).toBe("cancelled");
+    });
+
+    it("is idempotent when the order is already cancelled", async () => {
+      const created = await createOrder("user-a", sampleDraft);
+      await cancelOrder("user-a", created.id);
+
+      const again = await cancelOrder("user-a", created.id);
+
+      expect(again).toMatchObject({
+        ok: true,
+        order: { id: created.id, status: "cancelled" },
+      });
+    });
+
+    it("rejects cancelling a paid order", async () => {
+      const created = await createOrder("user-a", sampleDraft);
+      await markOrderAsPaid("user-a", created.id);
+
+      const result = await cancelOrder("user-a", created.id);
+
+      expect(result).toEqual({
+        ok: false,
+        error: "Paid orders cannot be cancelled from this flow",
+      });
+    });
+
+    it("returns notFound when the order belongs to another user", async () => {
+      const created = await createOrder("user-a", sampleDraft);
+
+      const result = await cancelOrder("user-b", created.id);
+
+      expect(result).toEqual({
+        ok: false,
+        error: "Order not found",
+        notFound: true,
+      });
     });
   });
 

@@ -192,12 +192,62 @@ export async function markOrderAsPaid(
     return undefined;
   }
 
+  if (existing.status === "cancelled") {
+    return undefined;
+  }
+
   const record = await prisma.order.update({
     where: { id: orderId },
     data: { status: "paid" },
     include: { items: true },
   });
   return mapOrder(record);
+}
+
+export type CancelOrderResult =
+  | { ok: true; order: Order }
+  | { ok: false; error: string; notFound?: true };
+
+/**
+ * Cancels a processing order owned by the user. Paid orders cannot be
+ * cancelled here (would need a refund flow).
+ */
+export async function cancelOrder(
+  userId: string,
+  orderId: string
+): Promise<CancelOrderResult> {
+  const existing = await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: { items: true },
+  });
+  if (!existing) {
+    return { ok: false, error: "Order not found", notFound: true };
+  }
+
+  if (existing.status === "cancelled") {
+    return { ok: true, order: mapOrder(existing) };
+  }
+
+  if (existing.status === "paid") {
+    return {
+      ok: false,
+      error: "Paid orders cannot be cancelled from this flow",
+    };
+  }
+
+  if (existing.status !== "processing") {
+    return {
+      ok: false,
+      error: `Order cannot be cancelled while status is ${existing.status}`,
+    };
+  }
+
+  const record = await prisma.order.update({
+    where: { id: orderId },
+    data: { status: "cancelled" },
+    include: { items: true },
+  });
+  return { ok: true, order: mapOrder(record) };
 }
 
 export async function listAllOrders(): Promise<Order[]> {

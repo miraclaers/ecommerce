@@ -83,4 +83,19 @@ describe("createCheckoutSessionAction", () => {
     });
     expect(stripeState.createSession).toHaveBeenCalledOnce();
   });
+
+  it("rejects carts that exceed catalog stock", async () => {
+    stripeState.configured = true;
+
+    const result = await createCheckoutSessionAction([
+      { id: "3", quantity: 9 },
+    ]);
+
+    expect(result).toEqual({
+      ok: false,
+      error:
+        "Insufficient stock for Gaming Mouse Pad: requested 9, available 8",
+    });
+    expect(stripeState.createSession).not.toHaveBeenCalled();
+  });
 });

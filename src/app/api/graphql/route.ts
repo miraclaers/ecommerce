@@ -3,7 +3,7 @@ import { getUserIdSafe } from "@/lib/auth";
 import { listProducts, readProductById } from "@/lib/product-data";
 import { createOrder, createOrderWithIdempotency, listOrders } from "@/lib/order-store";
 import { validateGraphQLQuery } from "@/lib/graphql-guard";
-import { computeOrderTotal } from "@/lib/order-pricing";
+import { computeOrderTotal, validateCartStock } from "@/lib/order-pricing";
 import type { CartItem } from "@/lib/types";
 import {
   isValidCart,
@@ -23,6 +23,7 @@ const schema = buildSchema(`
     createdAt: String!
     popularity: Int!
     rating: Float!
+    stock: Int!
     discountPercent: Int
   }
 
@@ -111,6 +112,11 @@ export async function POST(request: Request) {
       }
       if (total !== verifiedTotal) {
         throw new Error("Order total does not match catalog prices");
+      }
+
+      const stock = validateCartStock(items);
+      if (!stock.ok) {
+        throw new Error(stock.error);
       }
 
       const key =

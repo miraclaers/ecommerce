@@ -384,6 +384,18 @@ describe("orders API route (integration)", () => {
       });
     });
 
+    it("rejects when cart quantity exceeds catalog stock", async () => {
+      const res = await POST(
+        postRequest({ total: 351, items: [{ id: "3", quantity: 9 }] })
+      );
+
+      expect(res.status).toBe(409);
+      await expect(res.json()).resolves.toEqual({
+        error:
+          "Insufficient stock for Gaming Mouse Pad: requested 9, available 8",
+      });
+    });
+
     it("returns 500 when the order store fails to persist", async () => {
       prismaStore.failCreate = true;
 

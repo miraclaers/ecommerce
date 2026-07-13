@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { computeOrderTotal, verifyOrderTotal } from "./order-pricing";
+import {
+  computeOrderTotal,
+  validateCartStock,
+  verifyOrderTotal,
+} from "./order-pricing";
 
 describe("order-pricing", () => {
   describe("computeOrderTotal", () => {
@@ -33,6 +37,32 @@ describe("order-pricing", () => {
 
     it("rejects totals when items reference unknown products", () => {
       expect(verifyOrderTotal(100, [{ id: "999", quantity: 1 }])).toBe(false);
+    });
+  });
+
+  describe("validateCartStock", () => {
+    it("accepts quantities within catalog stock", () => {
+      expect(validateCartStock([{ id: "1", quantity: 2 }])).toEqual({
+        ok: true,
+      });
+      expect(validateCartStock([{ id: "3", quantity: 8 }])).toEqual({
+        ok: true,
+      });
+    });
+
+    it("rejects quantities above available stock", () => {
+      expect(validateCartStock([{ id: "3", quantity: 9 }])).toEqual({
+        ok: false,
+        error:
+          "Insufficient stock for Gaming Mouse Pad: requested 9, available 8",
+      });
+    });
+
+    it("rejects unknown products", () => {
+      expect(validateCartStock([{ id: "999", quantity: 1 }])).toEqual({
+        ok: false,
+        error: "Unknown product: 999",
+      });
     });
   });
 });

@@ -8,7 +8,7 @@ import {
   markOrderAsPaid,
 } from "@/lib/order-store";
 import { log } from "@/lib/logger";
-import { computeOrderTotal } from "@/lib/order-pricing";
+import { computeOrderTotal, validateCartStock } from "@/lib/order-pricing";
 import type { OrderDraft } from "@/lib/types";
 import {
   isValidCart,
@@ -77,6 +77,11 @@ export async function POST(request: Request) {
       { error: "Order total does not match catalog prices" },
       { status: 400 }
     );
+  }
+
+  const stock = validateCartStock(body.items);
+  if (!stock.ok) {
+    return NextResponse.json({ error: stock.error }, { status: 409 });
   }
 
   const draft: OrderDraft = {

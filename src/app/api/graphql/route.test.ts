@@ -187,6 +187,25 @@ describe("graphql API route (integration)", () => {
     expect(prismaStore.orders).toHaveLength(0);
   });
 
+  it("rejects createOrder when quantity exceeds catalog stock", async () => {
+    const res = await POST(
+      graphqlRequest(`
+        mutation {
+          createOrder(total: 351, items: [{ id: "3", quantity: 9 }]) {
+            id
+          }
+        }
+      `)
+    );
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(body.errors[0].message).toBe(
+      "Insufficient stock for Gaming Mouse Pad: requested 9, available 8"
+    );
+    expect(prismaStore.orders).toHaveLength(0);
+  });
+
   it("returns the authenticated user's orders via the orders query", async () => {
     await POST(graphqlRequest(CREATE_ORDER));
 

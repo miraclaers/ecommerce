@@ -12,6 +12,7 @@ const PRODUCTS: Product[] = [
     createdAt: "2026-02-05",
     popularity: 92,
     rating: 4.6,
+    stock: 25,
     discountPercent: 15,
   },
   {
@@ -25,6 +26,7 @@ const PRODUCTS: Product[] = [
     createdAt: "2026-02-18",
     popularity: 88,
     rating: 4.3,
+    stock: 15,
     discountPercent: 20,
   },
   {
@@ -38,6 +40,7 @@ const PRODUCTS: Product[] = [
     createdAt: "2026-01-26",
     popularity: 73,
     rating: 4.9,
+    stock: 8,
     discountPercent: 35,
   },
 ];

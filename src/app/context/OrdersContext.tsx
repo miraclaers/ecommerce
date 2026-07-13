@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { cancelOrderAction } from "@/app/actions/orders";
 import { fetchOrders, markOrderPaid, postOrder } from "@/lib/api-client";
 import type { Order, OrderDraft } from "@/lib/types";
 
@@ -8,6 +9,9 @@ interface OrdersContextType {
   orders: Order[];
   addOrder: (order: OrderDraft, idempotencyKey?: string) => Promise<Order>;
   setOrderPaid: (orderId: string) => Promise<void>;
+  cancelOrder: (
+    orderId: string
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
@@ -104,8 +108,21 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const cancelOrder = async (orderId: string) => {
+    const result = await cancelOrderAction(orderId);
+    if (!result.ok) {
+      return { ok: false as const, error: result.error };
+    }
+    setOrders((prev) =>
+      prev.map((order) => (order.id === orderId ? result.order : order))
+    );
+    return { ok: true as const };
+  };
+
   return (
-    <OrdersContext.Provider value={{ orders, addOrder, setOrderPaid }}>
+    <OrdersContext.Provider
+      value={{ orders, addOrder, setOrderPaid, cancelOrder }}
+    >
       {children}
     </OrdersContext.Provider>
   );

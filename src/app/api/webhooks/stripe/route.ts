@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { createPaidOrderFromStripe } from "@/lib/order-store";
 import { log } from "@/lib/logger";
-import { computeOrderTotal } from "@/lib/order-pricing";
+import { computeOrderTotal, validateCartStock } from "@/lib/order-pricing";
 import { getStripe } from "@/lib/stripe";
 import type { CartItem } from "@/lib/types";
 import { isValidCart, isValidTotal } from "@/lib/validate";
@@ -48,6 +48,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       sessionId: session.id,
       verifiedTotal,
       metadataTotal,
+    });
+    return;
+  }
+
+  const stock = validateCartStock(items);
+  if (!stock.ok) {
+    log("error", "stripe.webhook.insufficient_stock", {
+      sessionId: session.id,
+      error: stock.error,
     });
     return;
   }
