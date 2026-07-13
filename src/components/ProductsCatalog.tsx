@@ -189,6 +189,7 @@ export default function ProductsCatalog({
                 key={product.id}
                 product={product}
                 priority={index === 0}
+                index={index}
               />
             ))}
       </ul>

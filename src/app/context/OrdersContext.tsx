@@ -1,8 +1,10 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { cancelOrderAction } from "@/app/actions/orders";
 import { fetchOrders, markOrderPaid, postOrder } from "@/lib/api-client";
+import { isAppError } from "@/lib/errors";
 import type { Order, OrderDraft } from "@/lib/types";
 
 interface OrdersContextType {
@@ -45,7 +47,23 @@ function mergeOrders(localOrders: Order[], remoteOrders: Order[]): Order[] {
   );
 }
 
+function createLocalOrder(order: OrderDraft): Order {
+  return {
+    id: crypto.randomUUID(),
+    userId: "local",
+    total: order.total,
+    items: order.items,
+    date: new Date().toISOString(),
+    status: "processing",
+  };
+}
+
+function isExpectedAuthFailure(error: unknown): boolean {
+  return isAppError(error) && error.status === 401;
+}
+
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
+  const { isSignedIn } = useAuth();
   const [orders, setOrders] = useState<Order[]>(() =>
     typeof window === "undefined"
       ? []
@@ -53,14 +71,20 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    if (isSignedIn === false) {
+      return;
+    }
     fetchOrders()
       .then((remoteOrders) => {
         setOrders((prev) => mergeOrders(prev, remoteOrders));
       })
-      .catch(() => {
-        // Keep local orders if API is unavailable.
+      .catch((error) => {
+        // Guests and demo mode stay on localStorage; only log unexpected failures.
+        if (!isExpectedAuthFailure(error)) {
+          console.error("[orders] fetchOrders failed", error);
+        }
       });
-  }, []);
+  }, [isSignedIn]);
 
   useEffect(() => {
     window.localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
@@ -68,21 +92,24 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
   const addOrder = async (order: OrderDraft, idempotencyKey?: string) => {
     let created: Order;
-    try {
-      created = await postOrder(order, idempotencyKey);
-    } catch (error) {
-      // The flow stays usable offline/unauthenticated via the local fallback,
-      // but log first so a real API failure (e.g. 500 under CI load) is visible.
-      console.error("[orders] createOrder API failed, using local fallback", error);
-      created = {
-        id: crypto.randomUUID(),
-        userId: "local",
-        total: order.total,
-        items: order.items,
-        date: new Date().toISOString(),
-        status: "processing",
-      };
+
+    // Demo / guest checkout: persist locally without hitting the auth-gated API.
+    if (isSignedIn === false) {
+      created = createLocalOrder(order);
+    } else {
+      try {
+        created = await postOrder(order, idempotencyKey);
+      } catch (error) {
+        if (!isExpectedAuthFailure(error)) {
+          console.error(
+            "[orders] createOrder API failed, using local fallback",
+            error
+          );
+        }
+        created = createLocalOrder(order);
+      }
     }
+
     setOrders((prev) => {
       if (prev.some((existing) => existing.id === created.id)) {
         return prev;
@@ -94,12 +121,20 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
   const setOrderPaid = async (orderId: string) => {
     let updated: Order | null = null;
-    try {
-      updated = await markOrderPaid(orderId);
-    } catch (error) {
-      // Fall back to local update, but log so a 500/timeout under load is visible.
-      console.error("[orders] markOrderPaid API failed, using local fallback", error);
+
+    if (isSignedIn !== false) {
+      try {
+        updated = await markOrderPaid(orderId);
+      } catch (error) {
+        if (!isExpectedAuthFailure(error)) {
+          console.error(
+            "[orders] markOrderPaid API failed, using local fallback",
+            error
+          );
+        }
+      }
     }
+
     setOrders((prev) =>
       prev.map((order) => {
         if (order.id !== orderId) return order;

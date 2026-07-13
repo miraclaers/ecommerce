@@ -49,3 +49,6 @@ package.zip
 
 .vercel
 .env*
+
+# clerk configuration (can include secrets)
+/.clerk/
