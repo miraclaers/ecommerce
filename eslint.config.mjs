@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Lamatic-generated flows (uses `any`; regenerated on sync)
+    "lamatic/**",
   ]),
 ]);
 
