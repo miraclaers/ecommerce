@@ -99,7 +99,7 @@ export default function MessagesPage() {
                     onClick={() => handleSelectThread(thread.id)}
                     className={`w-full border-b border-zinc-100 px-4 py-3 text-left transition dark:border-zinc-800 ${
                       isSelected
-                        ? "bg-violet-50 dark:bg-violet-950/20"
+                        ? "bg-accent-soft dark:bg-accent-soft/20"
                         : "hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
                     }`}
                   >
@@ -157,7 +157,7 @@ export default function MessagesPage() {
                     key={message.id}
                     className={`max-w-[80%] rounded-2xl px-3 py-2 ${
                       message.sender === "me"
-                        ? "ml-auto bg-violet-600 text-white"
+                        ? "ml-auto bg-accent text-white"
                         : "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
                     }`}
                   >
@@ -165,7 +165,7 @@ export default function MessagesPage() {
                     <p
                       className={`mt-1 text-[11px] ${
                         message.sender === "me"
-                          ? "text-violet-100"
+                          ? "text-accent-fg"
                           : "text-zinc-500 dark:text-zinc-400"
                       }`}
                     >
@@ -184,11 +184,11 @@ export default function MessagesPage() {
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   placeholder="Write a message..."
-                  className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 outline-none transition focus:border-violet-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                  className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 outline-none transition focus:border-accent dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                 />
                 <button
                   type="submit"
-                  className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700"
+                  className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
                 >
                   Send
                 </button>

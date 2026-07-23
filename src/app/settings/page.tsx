@@ -30,7 +30,7 @@ export default function SettingsPage() {
       <div className="mb-8">
         <Link
           href="/"
-          className="text-sm font-medium text-violet-600 transition hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
+          className="text-sm font-medium text-accent transition hover:text-accent dark:text-accent dark:hover:text-accent"
         >
           ← Back to home
         </Link>

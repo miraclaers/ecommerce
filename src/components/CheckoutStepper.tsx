@@ -28,9 +28,9 @@ export default function CheckoutStepper({
               className={[
                 "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold",
                 isComplete
-                  ? "border-violet-600 bg-violet-600 text-white"
+                  ? "border-accent bg-accent text-white"
                   : isActive
-                  ? "border-violet-600 text-violet-700 dark:text-violet-300"
+                  ? "border-accent text-accent dark:text-accent"
                   : "border-zinc-300 text-zinc-400 dark:border-zinc-700 dark:text-zinc-500",
               ].join(" ")}
             >
@@ -41,7 +41,7 @@ export default function CheckoutStepper({
               className={[
                 "font-medium",
                 isComplete
-                  ? "text-violet-600"
+                  ? "text-accent"
                   : isActive
                   ? "text-zinc-900 dark:text-zinc-100"
                   : "text-zinc-400 dark:text-zinc-500",
@@ -56,7 +56,7 @@ export default function CheckoutStepper({
                 className={[
                   "h-px w-6 sm:w-10",
                   isComplete
-                    ? "bg-violet-600"
+                    ? "bg-accent"
                     : "bg-zinc-300 dark:bg-zinc-700",
                 ].join(" ")}
               />

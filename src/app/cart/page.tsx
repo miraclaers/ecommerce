@@ -94,8 +94,8 @@ export default function CartPage() {
 
       {cartItemsWithData.length === 0 ? (
         <>
-          <section className="border border-dashed border-violet-300/70 rounded-2xl p-10 text-center bg-violet-50/40 dark:border-violet-500/40 dark:bg-violet-950/20">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
+          <section className="border border-dashed border-accent/35 rounded-2xl p-10 text-center bg-accent-soft/40 dark:border-accent/40 dark:bg-accent-soft/20">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 text-accent">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -121,13 +121,13 @@ export default function CartPage() {
             <div className="mt-6 flex items-center justify-center gap-3">
               <Link
                 href="/products"
-                className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition"
+                className="px-6 py-3 bg-accent text-white rounded-lg hover:brightness-110 transition"
               >
                 Browse products
               </Link>
               <Link
                 href="/"
-                className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition dark:border-violet-400/40 dark:text-violet-300 dark:hover:bg-zinc-900"
+                className="px-6 py-3 border border-accent/30 text-accent rounded-lg hover:bg-white transition dark:border-accent/40 dark:text-accent dark:hover:bg-zinc-900"
               >
                 Back home
               </Link>
@@ -138,7 +138,7 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold mb-6">
               Products you might be interested in
             </h2>
-            <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {showSuggestionSkeletons || isLoadingProducts
                 ? Array.from({ length: 3 }).map((_, index) => (
                     <ProductCardSkeleton
@@ -250,9 +250,9 @@ export default function CartPage() {
               href="/checkout"
               className="
                 w-full px-6 py-3 text-center
-                bg-violet-600 text-white
+                bg-accent text-white
                 rounded-lg
-                hover:bg-violet-700
+                hover:brightness-110
                 transition
                 sm:w-auto
               "

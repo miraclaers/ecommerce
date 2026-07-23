@@ -1,30 +1,34 @@
+"use client";
+
 import Link from "next/link";
+import { FadeIn } from "@/components/motion/FadeIn";
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-8 sm:py-20">
-      <h1 className="text-4xl font-bold">
-        Mini Ecommerce
-      </h1>
-
-      <p className="mt-4 text-lg text-gray-600 dark:text-zinc-300">
-        A simple demo store built with Next.js, TypeScript and Context API.
-      </p>
-      <p className="mt-2 text-sm text-gray-500 dark:text-zinc-400">
-        About this demo: focused on clean UI, cart flow, and core e-commerce behavior.
-      </p>
-      <p className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-300">
-        Made by Alejo Castillo
-      </p>
-
-      <div className="mt-10">
-        <Link
-          href="/products"
-          className="inline-block bg-violet-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-violet-700 transition"
-        >
-          View Products
-        </Link>
-      </div>
+    <div className="shop-container flex min-h-[calc(100dvh-8.5rem)] flex-col justify-center py-16 sm:py-20">
+      <FadeIn className="max-w-2xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+          MiniShop
+        </p>
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+          A quiet demo store.
+        </h1>
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
+          Clean catalog, cart flow, and account surfaces — built to show
+          disciplined product UI, not noise.
+        </p>
+        <p className="mt-3 text-sm font-medium text-ink-subtle">
+          Made by Alejo Castillo
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/products" className="btn-accent px-6 py-3">
+            View products
+          </Link>
+          <Link href="/cart" className="btn-ghost px-6 py-3">
+            Open cart
+          </Link>
+        </div>
+      </FadeIn>
     </div>
   );
 }

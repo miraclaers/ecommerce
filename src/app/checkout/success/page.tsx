@@ -171,13 +171,13 @@ function CheckoutSuccessContent() {
         <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <Link
             href="/products"
-            className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition"
+            className="px-6 py-3 bg-accent text-white rounded-lg hover:brightness-110 transition"
           >
             Continue shopping
           </Link>
           <Link
             href="/"
-            className="px-6 py-3 border border-violet-200 text-violet-700 rounded-lg hover:bg-white transition dark:border-violet-400/40 dark:text-violet-300 dark:hover:bg-zinc-900"
+            className="px-6 py-3 border border-accent/30 text-accent rounded-lg hover:bg-white transition dark:border-accent/40 dark:text-accent dark:hover:bg-zinc-900"
           >
             Back home
           </Link>

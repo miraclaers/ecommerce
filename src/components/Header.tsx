@@ -2,13 +2,10 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/app/context/CartContext";
 
-// Defer the account menu (and the Clerk client UI it pulls in — UserButton,
-// SignIn/SignUp modals, useUser/useClerk) into its own async chunk so it does
-// not weigh down the header on first load. A fixed-size placeholder reserves
-// space to avoid layout shift while it hydrates.
 const AccountMenu = dynamic(() => import("@/components/AccountMenu"), {
   ssr: false,
   loading: () => <div className="h-10 w-10 shrink-0" aria-hidden />,
@@ -18,10 +15,16 @@ const THEME_KEY = "minishop-theme";
 
 export default function Header() {
   const { cart } = useCart();
-  const itemCount = cart.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
+  const router = useRouter();
+  const pathname = usePathname();
+  const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (pathname !== "/products") return;
+    const q = new URLSearchParams(window.location.search).get("q") ?? "";
+    setQuery(q);
+  }, [pathname]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(THEME_KEY);
@@ -35,30 +38,42 @@ export default function Header() {
           ? "dark"
           : "light";
 
-    document.documentElement.classList.toggle(
-      "dark",
-      nextTheme === "dark"
-    );
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
   }, []);
 
+  const onSearch = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const trimmed = query.trim();
+    const params = new URLSearchParams();
+    if (trimmed) params.set("q", trimmed);
+    const qs = params.toString();
+    router.push(qs ? `/products?${qs}` : "/products");
+  };
+
   return (
-    <header className="w-full border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <header className="sticky top-0 z-40 border-b border-line/80 bg-surface-elevated/90 backdrop-blur-md">
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-0"
+        className="shop-container flex flex-wrap items-center gap-3 py-3 sm:h-16 sm:flex-nowrap sm:gap-5 sm:py-0"
       >
         <Link
-          href="/"
-          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+          href="/products"
+          className="group flex shrink-0 items-center gap-2.5 text-ink transition duration-shop"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-sm font-semibold uppercase text-white dark:bg-zinc-100 dark:text-zinc-900">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink text-xs font-bold uppercase tracking-wide text-surface transition group-hover:bg-accent group-hover:text-accent-fg">
             MS
           </span>
-          MiniShop
+          <span className="font-display text-lg font-semibold tracking-tight">
+            MiniShop
+          </span>
         </Link>
 
-        <form className="relative order-3 w-full min-w-0 sm:order-none sm:flex-1">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+        <form
+          onSubmit={onSearch}
+          className="relative order-3 w-full min-w-0 sm:order-none sm:flex-1"
+          role="search"
+        >
+          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle">
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
@@ -76,25 +91,20 @@ export default function Header() {
           <input
             type="search"
             name="q"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Search products"
-            className="w-full rounded-full border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm text-zinc-700 outline-none transition focus:border-zinc-400 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:focus:border-zinc-500"
+            className="w-full rounded-full border border-line bg-surface-muted/70 py-2.5 pl-10 pr-4 text-sm text-ink outline-none transition duration-shop placeholder:text-ink-subtle focus:border-accent/40 focus:bg-surface-elevated focus:ring-2 focus:ring-ring/20"
             aria-label="Search products"
           />
         </form>
 
-        <div className="order-2 ml-auto flex shrink-0 items-center gap-2 text-sm font-medium text-zinc-600 sm:order-none sm:gap-3 dark:text-zinc-300">
-          <Link
-            href="/products"
-            className="hidden text-sm transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 sm:inline"
-          >
-            Products
-          </Link>
-
+        <div className="order-2 ml-auto flex shrink-0 items-center gap-1.5 text-sm font-medium text-ink-muted sm:order-none sm:gap-2">
           <AccountMenu />
 
           <Link
             href="/cart"
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line text-ink transition duration-shop hover:border-accent/35 hover:bg-accent-soft/50"
             aria-label="Open cart"
           >
             <svg
@@ -114,7 +124,7 @@ export default function Header() {
             {itemCount > 0 ? (
               <span
                 key={itemCount}
-                className="cart-badge-pop absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1 text-[11px] font-semibold text-white"
+                className="cart-badge-pop absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold text-accent-fg"
               >
                 {itemCount}
               </span>

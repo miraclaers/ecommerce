@@ -2,14 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --surface: 250 250 249;
+  --surface-elevated: 255 255 255;
+  --surface-muted: 244 244 245;
+  --ink: 24 24 27;
+  --ink-muted: 82 82 91;
+  --ink-subtle: 113 113 122;
+  --line: 228 228 231;
+  --accent: 12 74 110;
+  --accent-soft: 224 242 254;
+  --accent-fg: 255 255 255;
+  --ring: 12 74 110;
+  --shop-gutter: clamp(1rem, 4vw, 1.75rem);
+}
+
+.dark {
+  --surface: 9 9 11;
+  --surface-elevated: 24 24 27;
+  --surface-muted: 39 39 42;
+  --ink: 250 250 250;
+  --ink-muted: 161 161 170;
+  --ink-subtle: 113 113 122;
+  --line: 63 63 70;
+  --accent: 56 189 248;
+  --accent-soft: 12 74 110;
+  --accent-fg: 8 47 73;
+  --ring: 56 189 248;
+}
+
 .skip-link {
   position: absolute;
   left: -10000px;
   top: 1rem;
   z-index: 100;
   border-radius: 0.5rem;
-  background: #ffffff;
-  color: #18181b;
+  background: rgb(var(--surface-elevated));
+  color: rgb(var(--ink));
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
@@ -18,13 +47,8 @@
 
 .skip-link:focus {
   left: 1rem;
-  outline: 2px solid #7c3aed;
+  outline: 2px solid rgb(var(--ring));
   outline-offset: 2px;
-}
-
-.dark .skip-link {
-  background: #18181b;
-  color: #f4f4f5;
 }
 
 @layer base {
@@ -37,42 +61,61 @@
   }
 
   body {
-    @apply bg-zinc-50 text-zinc-900 antialiased transition-colors duration-200 dark:bg-zinc-950 dark:text-zinc-100;
+    @apply bg-surface text-ink antialiased;
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -20%,
+        rgb(var(--accent) / 0.06),
+        transparent 55%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(var(--surface-elevated) / 0.4) 0%,
+        transparent 28rem
+      );
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.18);
   }
 }
 
-body {
-  padding-bottom: 116px;
+@layer components {
+  .shop-container {
+    @apply mx-auto w-full max-w-shop;
+    padding-inline: var(--shop-gutter);
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-fg transition duration-shop;
+    @apply hover:brightness-110 active:scale-[0.98];
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-line bg-surface-elevated px-5 py-2.5 text-sm font-semibold text-ink transition duration-shop;
+    @apply hover:bg-surface-muted active:scale-[0.98];
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface;
+  }
 }
 
+/* In-flow footer — sober strip, no floating dock */
 .site-footer {
-  position: fixed;
-  left: 50%;
-  bottom: 12px;
-  transform: translateX(-50%);
-  width: min(1100px, calc(100% - 24px));
-  z-index: 25;
-  border: 1px solid color-mix(in srgb, #dbe3f2 82%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, #ffffff 88%, transparent);
+  margin-top: auto;
+  border-top: 1px solid rgb(var(--line));
+  background: rgb(var(--surface-elevated) / 0.85);
   backdrop-filter: blur(8px);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
-  padding: 8px 10px;
-}
-
-.dark .site-footer {
-  border-color: color-mix(in srgb, #24355d 82%, transparent);
-  background: color-mix(in srgb, #111d34 86%, transparent);
 }
 
 .footer-inner {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
-  max-width: 1280px;
+  gap: 1rem;
+  max-width: 72rem;
   margin: 0 auto;
-  padding: 0 8px;
+  padding: 1rem var(--shop-gutter);
   flex-wrap: wrap;
 }
 
@@ -81,173 +124,68 @@ body {
 }
 
 .portfolio-link {
-  background: #ffffff;
-  color: #0f172a;
-  padding: 10px 20px;
+  background: rgb(var(--surface-elevated));
+  color: rgb(var(--ink));
+  padding: 0.5rem 1.1rem;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #dbe3f2;
-  position: relative;
-  text-decoration: none;
+  border: 1px solid rgb(var(--line));
   font-weight: 600;
-  transition: transform 260ms ease, box-shadow 320ms ease, color 220ms ease;
-  min-width: 120px;
-  height: 50px;
-  overflow: hidden;
-  isolation: isolate;
+  font-size: 0.875rem;
+  min-height: 2.5rem;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
 }
 
-.dark .portfolio-link {
-  background: #111d34;
-  border-color: #24355d;
-  color: #e6edf9;
+.portfolio-link:hover {
+  border-color: rgb(var(--accent) / 0.45);
+  background: rgb(var(--accent-soft) / 0.55);
+  color: rgb(var(--accent));
 }
 
 .portfolio-link:focus-visible {
-  outline: 2px solid rgb(99 102 241);
+  outline: 2px solid rgb(var(--ring));
   outline-offset: 2px;
 }
 
 .social-bubble {
-  --bubble-ring: rgba(15, 23, 42, 0.15);
-  --lava-a: #5d95ff;
-  --lava-b: #2dd4bf;
-  --lava-c: #a78bfa;
-  --lava-d: #f472b6;
-  width: 50px;
-  height: 50px;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--bubble-ring);
-  background: #ffffff;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
+  border: 1px solid rgb(var(--line));
+  background: rgb(var(--surface-elevated));
   text-decoration: none;
-  transition: transform 260ms ease, box-shadow 320ms ease;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
-.dark .social-bubble {
-  --bubble-ring: rgba(255, 255, 255, 0.24);
-  background: #111d34;
+.social-bubble:hover {
+  border-color: rgb(var(--accent) / 0.45);
+  background: rgb(var(--accent-soft) / 0.4);
+  transform: translateY(-1px);
 }
 
 .social-bubble:focus-visible {
-  outline: 2px solid rgb(99 102 241);
+  outline: 2px solid rgb(var(--ring));
   outline-offset: 2px;
 }
 
-.portfolio-link::before,
-.social-bubble::before,
-.social-bubble::after {
-  content: "";
-  position: absolute;
-  border-radius: 42%;
-  opacity: 0;
-  transform: translateY(35%) scale(0.84);
-  transition: transform 520ms ease, opacity 360ms ease;
-  pointer-events: none;
-}
-
-.portfolio-link::before {
-  inset: -24%;
-  background:
-    radial-gradient(circle at 22% 30%, #5d95ff, transparent 58%),
-    radial-gradient(circle at 78% 28%, #2dd4bf, transparent 58%),
-    radial-gradient(circle at 24% 78%, #f472b6, transparent 60%),
-    radial-gradient(circle at 76% 76%, #a78bfa, transparent 58%);
-  filter: blur(2px) saturate(130%);
-  z-index: -1;
-}
-
-.social-bubble::before {
-  inset: -24%;
-  background:
-    radial-gradient(circle at 22% 30%, var(--lava-a), transparent 58%),
-    radial-gradient(circle at 78% 28%, var(--lava-b), transparent 58%),
-    radial-gradient(circle at 24% 78%, var(--lava-c), transparent 60%),
-    radial-gradient(circle at 76% 76%, var(--lava-d), transparent 58%);
-  filter: blur(2px) saturate(130%);
-}
-
-.social-bubble::after {
-  inset: -12%;
-  background: conic-gradient(from 40deg, var(--lava-a), var(--lava-b), var(--lava-c), var(--lava-d), var(--lava-a));
-  mix-blend-mode: screen;
-  filter: blur(8px) saturate(130%);
-}
-
-
-.social-github {
-  --lava-a: #161b22;
-  --lava-b: #21262d;
-  --lava-c: #30363d;
-  --lava-d: #238636;
-}
-
-.social-linkedin {
-  --lava-a: #0a66c2;
-  --lava-b: #004182;
-  --lava-c: #1d8bf1;
-  --lava-d: #7dbfff;
-}
-
 .social-icon {
-  width: 22px;
-  height: 22px;
-  position: relative;
-  z-index: 2;
-  transition: transform 520ms cubic-bezier(0.2, 0.86, 0.38, 0.99), filter 240ms ease;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .dark .social-icon {
   filter: brightness(0) invert(1);
 }
 
-.social-bubble:focus-visible .social-icon {
-  filter: brightness(0) invert(1);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .portfolio-link:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.32);
-    border-color: transparent;
-    color: #ffffff;
-  }
-
-  .social-bubble:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
-  }
-
-  .portfolio-link:hover::before {
-    opacity: 0.98;
-    transform: translateY(0) scale(1.04);
-    animation: lava-breathe 2.6s ease-in-out infinite;
-  }
-
-  .social-bubble:hover::before,
-  .social-bubble:hover::after {
-    opacity: 0.98;
-    transform: translateY(0) scale(1.06);
-    animation: lava-swirl 2.9s linear infinite;
-  }
-
-  .social-bubble:hover .social-icon {
-    transform: rotate(360deg) scale(1.07);
-    filter: brightness(0) invert(1);
-  }
-}
-
 @keyframes pageFade {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -256,35 +194,7 @@ body {
 }
 
 .page-transition {
-  animation: pageFade 260ms ease-out;
-  will-change: transform, opacity;
-}
-
-@keyframes lava-swirl {
-  0% {
-    transform: translateY(0) rotate(0deg) scale(1.06);
-  }
-  50% {
-    transform: translateY(-2px) rotate(180deg) scale(1.12);
-  }
-  100% {
-    transform: translateY(0) rotate(360deg) scale(1.06);
-  }
-}
-
-@keyframes lava-breathe {
-  0% {
-    transform: translateY(0) scale(1.01);
-    filter: blur(2px) saturate(125%);
-  }
-  50% {
-    transform: translateY(-1px) scale(1.07);
-    filter: blur(3px) saturate(145%);
-  }
-  100% {
-    transform: translateY(0) scale(1.01);
-    filter: blur(2px) saturate(125%);
-  }
+  animation: pageFade 220ms ease-out;
 }
 
 @keyframes shimmer {
@@ -299,22 +209,12 @@ body {
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(226, 232, 240, 0.7) 0%,
-    rgba(248, 250, 252, 0.9) 50%,
-    rgba(226, 232, 240, 0.7) 100%
+    rgb(var(--surface-muted)) 0%,
+    rgb(var(--surface-elevated)) 50%,
+    rgb(var(--surface-muted)) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
-}
-
-.dark .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(39, 39, 42, 0.9) 0%,
-    rgba(63, 63, 70, 0.9) 50%,
-    rgba(39, 39, 42, 0.9) 100%
-  );
-  background-size: 200% 100%;
 }
 
 @keyframes badgePop {
@@ -322,10 +222,10 @@ body {
     transform: scale(1);
   }
   35% {
-    transform: scale(1.25);
+    transform: scale(1.2);
   }
   70% {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
   100% {
     transform: scale(1);
@@ -351,25 +251,13 @@ body {
   animation: toastIn 200ms ease-out;
 }
 
-@media (max-width: 860px) {
-  body {
-    padding-bottom: 124px;
-  }
-
-  .site-footer {
-    width: calc(100% - 16px);
-    bottom: 8px;
-    border-radius: 16px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .page-transition,
+  .cart-badge-pop,
+  .toast-pop,
+  .skeleton-shimmer,
   .portfolio-link,
-  .social-bubble,
-  .social-icon,
-  .portfolio-link::before,
-  .social-bubble::before,
-  .social-bubble::after {
+  .social-bubble {
     animation: none !important;
     transition: none !important;
   }

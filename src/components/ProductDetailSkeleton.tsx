@@ -1,7 +1,7 @@
 export default function ProductDetailSkeleton() {
   return (
     <section className="grid gap-12 md:grid-cols-2">
-      <div className="rounded-xl border-4 border-violet-600 p-4">
+      <div className="rounded-xl border border-line p-4 shadow-card">
         <div className="h-72 w-full rounded-lg skeleton-shimmer" />
         <div className="mt-4 flex gap-3">
           {Array.from({ length: 4 }).map((_, index) => (

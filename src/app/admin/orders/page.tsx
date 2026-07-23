@@ -32,7 +32,7 @@ export default async function AdminOrdersPage() {
         </p>
         <Link
           href="/products"
-          className="mt-6 inline-block text-sm font-medium text-violet-600 hover:underline"
+          className="mt-6 inline-block text-sm font-medium text-accent hover:underline"
         >
           Back to catalog
         </Link>

@@ -1,8 +1,31 @@
+export interface ProductSpec {
+  label: string;
+  value: string;
+}
+
+export interface ProductReview {
+  id: string;
+  author: string;
+  rating: number;
+  date: string;
+  title: string;
+  body: string;
+}
+
+export interface ProductShipping {
+  weightNote: string;
+}
+
 export interface Product {
   id: string;
   title: string;
   price: number;
   description: string;
+  longDescription: string;
+  highlights: string[];
+  specs: ProductSpec[];
+  shipping: ProductShipping;
+  reviews: ProductReview[];
   image: string;
   category: string;
   createdAt: string;

@@ -28,7 +28,11 @@ export default function Footer() {
           aria-label="LinkedIn Profile"
           title="LinkedIn"
         >
-          <img src="/assets/icons/linkedin.svg" alt="" className="social-icon" />
+          <img
+            src="/assets/icons/linkedin.svg"
+            alt=""
+            className="social-icon"
+          />
         </a>
       </div>
     </footer>

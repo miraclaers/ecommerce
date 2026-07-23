@@ -13,7 +13,7 @@ export default function CheckoutErrorPage() {
 
       <Link
         href="/checkout"
-        className="text-violet-600 underline"
+        className="text-accent underline"
       >
         Back to checkout
       </Link>

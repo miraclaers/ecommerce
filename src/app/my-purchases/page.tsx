@@ -78,7 +78,7 @@ export default function MyPurchasesPage() {
   if (orders.length === 0) {
     return (
       <div className="mx-auto max-w-4xl p-8">
-        <section className="rounded-2xl border border-dashed border-violet-300/70 bg-violet-50/40 p-10 text-center dark:border-violet-500/40 dark:bg-violet-950/20">
+        <section className="rounded-2xl border border-dashed border-accent/35 bg-accent-soft/40 p-10 text-center dark:border-accent/40 dark:bg-accent-soft/20">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">
             No purchases yet
           </h1>
@@ -87,7 +87,7 @@ export default function MyPurchasesPage() {
           </p>
           <Link
             href="/products"
-            className="mt-6 inline-flex rounded-lg bg-violet-600 px-6 py-3 text-white transition hover:bg-violet-700"
+            className="mt-6 inline-flex rounded-lg bg-accent px-6 py-3 text-white transition hover:brightness-110"
           >
             Start shopping
           </Link>

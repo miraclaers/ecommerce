@@ -42,7 +42,7 @@ export default function PayPage() {
   return (
     <div className="mx-auto max-w-lg p-4 sm:p-8">
       <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-700">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 text-accent">
           <svg
             aria-hidden="true"
             viewBox="0 0 24 24"
@@ -86,7 +86,7 @@ export default function PayPage() {
         <button
           onClick={() => void handlePayment()}
           disabled={loading || cart.length === 0}
-          className="mt-6 w-full bg-violet-600 text-white px-6 py-3 rounded-lg hover:bg-violet-700 transition disabled:opacity-50"
+          className="mt-6 w-full bg-accent text-white px-6 py-3 rounded-lg hover:brightness-110 transition disabled:opacity-50"
         >
           {loading ? "Processing..." : "Confirm payment"}
         </button>

@@ -44,7 +44,7 @@ export default function FavoritesPage() {
           </p>
           <Link
             href="/products"
-            className="mt-6 inline-flex rounded-lg bg-violet-600 px-6 py-3 text-white transition hover:bg-violet-700"
+            className="mt-6 inline-flex rounded-lg bg-accent px-6 py-3 text-white transition hover:brightness-110"
           >
             Browse products
           </Link>
@@ -62,7 +62,7 @@ export default function FavoritesPage() {
         {favorites.length} saved {favorites.length === 1 ? "product" : "products"}.
       </p>
 
-      <ul className="columns-1 gap-x-4 sm:columns-[13rem] md:columns-[14rem] lg:columns-[15rem]">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading
           ? Array.from({ length: 6 }).map((_, index) => (
               <ProductCardSkeleton key={`favorite-skeleton-${index}`} />

@@ -59,7 +59,7 @@ export default function CollectionPicker({
         onClick={() => setOpen(true)}
         className={
           buttonClassName ??
-          "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/40"
+          "inline-flex cursor-pointer items-center gap-2 rounded-lg border border-accent/30 bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent transition hover:bg-accent-soft/80 dark:border-accent/40"
         }
       >
         <svg
@@ -125,7 +125,7 @@ export default function CollectionPicker({
                             }
                             className={`rounded-md px-2 py-1 text-xs font-semibold transition ${
                               checked
-                                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                                ? "bg-accent text-accent-fg hover:brightness-110"
                                 : "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
                             }`}
                           >
@@ -155,11 +155,11 @@ export default function CollectionPicker({
                       setNewCollectionName(event.target.value)
                     }
                     placeholder="Example: Work Setup"
-                    className="w-full rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-800 outline-none transition focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="w-full rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-800 outline-none transition focus:border-accent dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                   />
                   <button
                     type="submit"
-                    className="w-full rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                    className="w-full rounded-md bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg transition hover:brightness-110"
                   >
                     Create and keep editing
                   </button>

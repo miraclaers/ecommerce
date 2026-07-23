@@ -31,7 +31,7 @@ export default function Error({
         <button
           type="button"
           onClick={reset}
-          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:brightness-110"
         >
           Try again
         </button>
