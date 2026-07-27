@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 
 type FadeInProps = {
   children: ReactNode;
@@ -9,6 +9,8 @@ type FadeInProps = {
   delay?: number;
   y?: number;
 };
+
+const emptySubscribe = () => () => {};
 
 /**
  * Visible on SSR / before hydration (no opacity:0 flash).
@@ -21,11 +23,7 @@ export function FadeIn({
   y = 12,
 }: FadeInProps) {
   const reduceMotion = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   if (!mounted || reduceMotion) {
     return <div className={className}>{children}</div>;

@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Outfit, Fraunces } from "next/font/google";
 import Header from "@/components/Header";
@@ -78,7 +79,9 @@ export default function RootLayout({
                 <FavoritesProvider>
                   <CollectionsProvider>
                     <MessagesProvider>
-                      <Header />
+                      <Suspense fallback={<div className="h-16 border-b border-line/80" aria-hidden />}>
+                        <Header />
+                      </Suspense>
                       <main id="main-content" className="flex-1">
                         <PageTransition>{children}</PageTransition>
                       </main>

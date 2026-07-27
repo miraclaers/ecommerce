@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Product } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -25,9 +25,9 @@ export default function ProductsCatalog({
   const minProductPrice = prices.length > 0 ? Math.min(...prices) : 0;
   const maxProductPrice = prices.length > 0 ? Math.max(...prices) : 0;
 
-  const [searchQuery, setSearchQuery] = useState(
-    () => searchParams.get("q") ?? ""
-  );
+  const urlQuery = searchParams.get("q") ?? "";
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
+  const [trackedUrlQuery, setTrackedUrlQuery] = useState(urlQuery);
   const debouncedSearch = useDebouncedValue(searchQuery, 300);
   const [activeCategory, setActiveCategory] = useState("All");
   const [minPrice, setMinPrice] = useState(minProductPrice);
@@ -36,9 +36,10 @@ export default function ProductsCatalog({
     "newest" | "price-low" | "price-high" | "popular"
   >("newest");
 
-  useEffect(() => {
-    setSearchQuery(searchParams.get("q") ?? "");
-  }, [searchParams]);
+  if (urlQuery !== trackedUrlQuery) {
+    setTrackedUrlQuery(urlQuery);
+    setSearchQuery(urlQuery);
+  }
 
   const filteredProducts = useMemo(() => {
     const normalizedMin = Math.min(minPrice, maxPrice);

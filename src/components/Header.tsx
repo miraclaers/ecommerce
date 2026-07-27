@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { FormEvent, useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/app/context/CartContext";
 
 const AccountMenu = dynamic(() => import("@/components/AccountMenu"), {
@@ -17,14 +17,16 @@ export default function Header() {
   const { cart } = useCart();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const [query, setQuery] = useState("");
+  const urlQuery = pathname === "/products" ? (searchParams.get("q") ?? "") : "";
+  const [query, setQuery] = useState(urlQuery);
+  const [trackedUrlQuery, setTrackedUrlQuery] = useState(urlQuery);
 
-  useEffect(() => {
-    if (pathname !== "/products") return;
-    const q = new URLSearchParams(window.location.search).get("q") ?? "";
-    setQuery(q);
-  }, [pathname]);
+  if (urlQuery !== trackedUrlQuery) {
+    setTrackedUrlQuery(urlQuery);
+    setQuery(urlQuery);
+  }
 
   useEffect(() => {
     const saved = window.localStorage.getItem(THEME_KEY);
