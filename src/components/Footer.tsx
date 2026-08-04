@@ -22,7 +22,7 @@ export default function Footer() {
         </a>
         <a
           className="social-bubble social-linkedin"
-          href="https://www.linkedin.com/in/alejo-castillo-0b02b73b0/"
+          href="https://www.linkedin.com/in/alejo-castillo-gonzalez/"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="LinkedIn Profile"
