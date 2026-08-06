@@ -14,7 +14,7 @@ export default function HomePage() {
           A quiet demo store.
         </h1>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
-          Clean catalog, cart flow, and account surfaces — built to show
+          Clean catalog, cart flow, and account surfaces, built to show
           disciplined product UI, not noise.
         </p>
         <p className="mt-3 text-sm font-medium text-ink-subtle">

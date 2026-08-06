@@ -45,7 +45,7 @@ export default async function AdminOrdersPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Admin — all orders
+        Admin: all orders
       </h1>
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
         SSR page protected by Clerk middleware and role check.
@@ -60,7 +60,7 @@ export default async function AdminOrdersPage() {
               className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
             >
               <p className="font-medium text-zinc-900 dark:text-zinc-50">
-                {formatCurrency(order.total)} — {order.status}
+                {formatCurrency(order.total)} · {order.status}
               </p>
               <p className="text-xs text-zinc-500">
                 User {order.userId.slice(0, 8)}… · {order.date}

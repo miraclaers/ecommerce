@@ -53,7 +53,7 @@ export function RealtimeProvider({
     try {
       socket = new WebSocket(wsUrl);
     } catch {
-      // e.g. mixed-content (ws:// from https://) — fail silently instead of
+      // e.g. mixed-content (ws:// from https://), fail silently instead of
       // crashing the whole app.
       return;
     }

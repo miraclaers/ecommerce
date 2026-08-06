@@ -70,10 +70,10 @@ export default function SettingsPage() {
         </h2>
         <ul className="space-y-3 text-sm text-zinc-600 dark:text-zinc-300">
           <li className="rounded-lg border border-dashed border-zinc-200 px-3 py-3 dark:border-zinc-700">
-            Personal data — connect to your account flow when you add auth.
+            Personal data: connect to your account flow when you add auth.
           </li>
           <li className="rounded-lg border border-dashed border-zinc-200 px-3 py-3 dark:border-zinc-700">
-            Notifications — stub for future email / push preferences.
+            Notifications: stub for future email / push preferences.
           </li>
         </ul>
       </section>

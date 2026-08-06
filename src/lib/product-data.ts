@@ -3,7 +3,7 @@ import type { Product } from "@/lib/types";
 /** Shared demo shipping policy shown on every product detail page. */
 export const STORE_SHIPPING = {
   disclaimer:
-    "Demo store — no real fulfillment. Tracking numbers and carrier handoffs are simulated for portfolio purposes.",
+    "Demo store, no real fulfillment. Tracking numbers and carrier handoffs are simulated for portfolio purposes.",
   origin: "MiniShop Demo Warehouse · Austin, TX (US)",
   methods: [
     {
@@ -78,7 +78,7 @@ const PRODUCTS: Product[] = [
         rating: 4,
         date: "2026-02-28",
         title: "Clear mics, slight hiss in transparency",
-        body: "Call quality surprised me — coworkers stopped asking me to repeat myself. Transparency mode is usable outdoors though there’s a faint hiss at max volume. Multipoint with laptop + phone just works.",
+        body: "Call quality surprised me, coworkers stopped asking me to repeat myself. Transparency mode is usable outdoors though there’s a faint hiss at max volume. Multipoint with laptop + phone just works.",
       },
       {
         id: "r1-3",
@@ -94,7 +94,7 @@ const PRODUCTS: Product[] = [
         rating: 4,
         date: "2026-01-30",
         title: "Comfortable for long sessions",
-        body: "Wore them through a full coding day. Clamp force is medium — fine for glasses. App-less controls are enough; I didn’t miss a companion app. Demo shipping arrived in the simulated 4-day window.",
+        body: "Wore them through a full coding day. Clamp force is medium, fine for glasses. App-less controls are enough; I didn’t miss a companion app. Demo shipping arrived in the simulated 4-day window.",
       },
     ],
     image: "/products/headphones.jpg",
@@ -112,7 +112,7 @@ const PRODUCTS: Product[] = [
     description:
       "Tactile mechanical keyboard with durable switches and customizable RGB lighting.",
     longDescription:
-      "A tenkeyless mechanical board for desks that need room for a mouse. Hot-swappable tactile switches give a crisp bump without the sharp click of clicky stems — good for shared offices and late-night sessions. South-facing RGB under double-shot PBT keycaps stays readable after months of use.\n\nConnect over USB-C, 2.4 GHz dongle, or Bluetooth. The gasket-mounted plate softens bottom-out, and the pre-lubed stabilizers keep big keys quiet. Removable feet offer two typing angles out of the box.",
+      "A tenkeyless mechanical board for desks that need room for a mouse. Hot-swappable tactile switches give a crisp bump without the sharp click of clicky stems, good for shared offices and late-night sessions. South-facing RGB under double-shot PBT keycaps stays readable after months of use.\n\nConnect over USB-C, 2.4 GHz dongle, or Bluetooth. The gasket-mounted plate softens bottom-out, and the pre-lubed stabilizers keep big keys quiet. Removable feet offer two typing angles out of the box.",
     highlights: [
       "TKL layout (87-key) · gasket mount",
       "Hot-swap sockets · tactile switches pre-installed",
@@ -146,7 +146,7 @@ const PRODUCTS: Product[] = [
         rating: 5,
         date: "2026-03-08",
         title: "Quiet tactile, great for office",
-        body: "Bump is clear without the clicky noise that got me side-eye before. Stabilizers feel pre-lubed — no rattle on spacebar. Tri-mode switching is snappy; I leave the dongle in the laptop.",
+        body: "Bump is clear without the clicky noise that got me side-eye before. Stabilizers feel pre-lubed, no rattle on spacebar. Tri-mode switching is snappy; I leave the dongle in the laptop.",
       },
       {
         id: "r2-2",
@@ -162,7 +162,7 @@ const PRODUCTS: Product[] = [
         rating: 4,
         date: "2026-02-09",
         title: "Hot-swap ready for tinkerers",
-        body: "Swapped in linears in under ten minutes. Stock browns are fine for coding. Bluetooth latency is okay for typing, not for competitive games — use the dongle there. Battery lasts about a week with RGB low.",
+        body: "Swapped in linears in under ten minutes. Stock browns are fine for coding. Bluetooth latency is okay for typing, not for competitive games, use the dongle there. Battery lasts about a week with RGB low.",
       },
       {
         id: "r2-4",
@@ -170,7 +170,7 @@ const PRODUCTS: Product[] = [
         rating: 5,
         date: "2026-01-25",
         title: "PBT keycaps feel premium",
-        body: "Texture hasn’t shined after a month of heavy use. South-facing LEDs don’t wash out legends. Demo checkout and shipping copy were clear that nothing ships for real — still a nice product page experience.",
+        body: "Texture hasn’t shined after a month of heavy use. South-facing LEDs don’t wash out legends. Demo checkout and shipping copy were clear that nothing ships for real, still a nice product page experience.",
       },
     ],
     image: "/products/keyboard.jpg",
@@ -188,7 +188,7 @@ const PRODUCTS: Product[] = [
     description:
       "Large gaming mouse pad with smooth tracking, stitched edges, and spill resistance.",
     longDescription:
-      "A desk-spanning cloth pad that keeps keyboard and mouse on one consistent surface. The low-friction weave favors both optical and laser sensors, while a natural rubber base grips wood and laminate desks without residue.\n\nStitched edges resist fraying after daily mouse sweeps. A light spill-resistant coating beads water long enough to wipe — not a submarine, but coffee accidents are less dramatic. Rolls for travel and flattens within an hour of unboxing.",
+      "A desk-spanning cloth pad that keeps keyboard and mouse on one consistent surface. The low-friction weave favors both optical and laser sensors, while a natural rubber base grips wood and laminate desks without residue.\n\nStitched edges resist fraying after daily mouse sweeps. A light spill-resistant coating beads water long enough to wipe, not a submarine, but coffee accidents are less dramatic. Rolls for travel and flattens within an hour of unboxing.",
     highlights: [
       "Extended size 900 × 400 × 3 mm",
       "Stitched anti-fray edges",
@@ -219,7 +219,7 @@ const PRODUCTS: Product[] = [
         rating: 5,
         date: "2026-03-15",
         title: "Finally covers the whole desk",
-        body: "Keyboard and mouse live on one surface now — no more lip between pad and desk. Stitching is low and doesn’t catch the mouse. Rubber base doesn’t slide even with aggressive flicks.",
+        body: "Keyboard and mouse live on one surface now, no more lip between pad and desk. Stitching is low and doesn’t catch the mouse. Rubber base doesn’t slide even with aggressive flicks.",
       },
       {
         id: "r3-2",
@@ -227,7 +227,7 @@ const PRODUCTS: Product[] = [
         rating: 5,
         date: "2026-02-26",
         title: "Spill save is real",
-        body: "Knocked half a latte — wiped it before it soaked. Surface speed is medium; I didn’t need to retune DPI. Flattened overnight after arriving rolled. Great value for the size.",
+        body: "Knocked half a latte, wiped it before it soaked. Surface speed is medium; I didn’t need to retune DPI. Flattened overnight after arriving rolled. Great value for the size.",
       },
       {
         id: "r3-3",
@@ -235,7 +235,7 @@ const PRODUCTS: Product[] = [
         rating: 4,
         date: "2026-02-11",
         title: "Consistent tracking",
-        body: "No spin-outs at the edges with a lightweight mouse. Wish there were a XXL option, but 90 cm is enough for my 120 cm desk. Color is matte — no rainbow RGB nonsense.",
+        body: "No spin-outs at the edges with a lightweight mouse. Wish there were a XXL option, but 90 cm is enough for my 120 cm desk. Color is matte, no rainbow RGB nonsense.",
       },
       {
         id: "r3-4",
@@ -243,7 +243,7 @@ const PRODUCTS: Product[] = [
         rating: 5,
         date: "2026-01-19",
         title: "Quiet, dense feel",
-        body: "Thicker than my old pad without feeling spongy. Edges haven’t frayed after six weeks. Demo shipping note about the tube was accurate — pack it carefully if you gift it.",
+        body: "Thicker than my old pad without feeling spongy. Edges haven’t frayed after six weeks. Demo shipping note about the tube was accurate, pack it carefully if you gift it.",
       },
     ],
     image: "/products/mousepad.jpg",
