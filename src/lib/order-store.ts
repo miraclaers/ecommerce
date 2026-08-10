@@ -55,10 +55,6 @@ export async function createOrder(
   return mapOrder(record);
 }
 
-/**
- * Creates an order once per (userId, idempotencyKey). Replays return the
- * original order without inserting a duplicate row.
- */
 export async function createOrderWithIdempotency(
   userId: string,
   input: OrderDraft,
@@ -208,10 +204,6 @@ export type CancelOrderResult =
   | { ok: true; order: Order }
   | { ok: false; error: string; notFound?: true };
 
-/**
- * Cancels a processing order owned by the user. Paid orders cannot be
- * cancelled here (would need a refund flow).
- */
 export async function cancelOrder(
   userId: string,
   orderId: string

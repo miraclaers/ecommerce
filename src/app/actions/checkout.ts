@@ -11,11 +11,6 @@ export type CreateCheckoutSessionResult =
   | { ok: true; url: string }
   | { ok: false; error: string; demo?: true };
 
-/**
- * Starts a Stripe Checkout Session (test mode when using sk_test_* keys).
- * Returns `{ demo: true }` when Stripe is not configured so the pay page
- * can fall back to the local demo path (CI / local without keys).
- */
 export async function createCheckoutSessionAction(
   items: CartItem[]
 ): Promise<CreateCheckoutSessionResult> {
