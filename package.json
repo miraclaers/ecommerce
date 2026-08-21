@@ -30,13 +30,16 @@
     "ci": "npm run lint && npm run type-check && npm run test && npm run build",
     "ci:full": "npm run ci && npm run test:e2e"
   },
+  "overrides": {
+    "deepmerge-ts": "8.0.1"
+  },
   "dependencies": {
     "@clerk/nextjs": "^7.4.3",
     "@prisma/client": "^6.19.3",
     "@sentry/nextjs": "^10.56.0",
     "graphql": "^16.13.2",
     "motion": "^12.42.2",
-    "next": "16.2.10",
+    "next": "^16.3.1",
     "prisma": "^6.19.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
