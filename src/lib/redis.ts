@@ -13,9 +13,7 @@ async function getClient() {
   }
   if (!client) {
     client = createClient({ url: process.env.REDIS_URL });
-    client.on("error", () => {
-      // Silent fallback to in-memory behavior in local environments.
-    });
+    client.on("error", () => {});
     await client.connect();
   }
   return client;

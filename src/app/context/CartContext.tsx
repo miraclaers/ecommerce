@@ -67,7 +67,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         );
       }
     } catch {
-      // Ignore corrupted storage values
     } finally {
       hasLoaded.current = true;
     }
@@ -78,18 +77,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
           setCart(remoteItems);
         }
       })
-      .catch(() => {
-        // Demo mode: keep local cart when API/Redis is unavailable.
-      });
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
     if (!hasLoaded.current) return;
     localStorage.setItem(storageKey, JSON.stringify(cart));
     if (!cartSessionRef.current) return;
-    syncCartAction(cartSessionRef.current, cart).catch(() => {
-      // Demo mode fallback.
-    });
+    syncCartAction(cartSessionRef.current, cart).catch(() => {});
   }, [cart]);
 
   const addToCart = (id: string) => {

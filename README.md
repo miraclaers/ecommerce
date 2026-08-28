@@ -42,6 +42,24 @@ Deeper notes: [`docs/frontend-architecture.md`](docs/frontend-architecture.md), 
 | Catalog | Server-loaded listing + SSG/ISR product pages |
 | Cart writes | Server Action (`syncCartAction`) instead of client `PUT` |
 
+## Runtime and migration notes
+
+- The cart is stored in Redis when `REDIS_URL` is configured. Local development
+	can fall back to memory, while the browser also keeps a local copy so the demo
+	remains usable when the API or Redis is unavailable.
+- Guest and demo checkout stays in `localStorage`; authenticated orders use the
+	auth-gated API and Postgres. This keeps local exploration separate from real
+	orders.
+- Stripe webhook persistence is unique on `stripeSessionId`, and the orders API
+	accepts an `Idempotency-Key`, so retries do not create duplicate orders.
+- Vercel Preview builds skip `prisma migrate deploy` because their database may
+	be ephemeral or absent. Production, CI and local builds run migrations.
+- `scripts/migrate-legacy-orders.mjs` is a repeatable Redis-to-Postgres cutover
+	tool. It defaults to a dry run, skips existing Postgres order IDs during
+	backfill, and supports `--apply`, `--keep-redis` and `--skip-backfill`.
+- Older collection data is normalized for compatibility with the previous
+	`{ gaming: ["1", "2", "3"] }` shape.
+
 ## Run locally
 
 ```bash

@@ -100,7 +100,6 @@
   }
 }
 
-/* In-flow footer, sober strip, no floating dock */
 .site-footer {
   margin-top: auto;
   border-top: 1px solid rgb(var(--line));

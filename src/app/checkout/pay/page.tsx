@@ -26,7 +26,6 @@ export default function PayPage() {
       }
 
       if (result.demo) {
-        // Local/CI without Stripe keys, keep the demo path working.
         router.push("/checkout/success");
         return;
       }

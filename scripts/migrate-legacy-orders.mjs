@@ -1,24 +1,3 @@
-// One-off maintenance script for the Redis -> Postgres order cutover.
-//
-// The live `order-store` already writes orders only to Postgres (Prisma). This
-// script handles the leftover legacy data that the old Redis adapter wrote under
-// `orders:user:{userId}` (indexed by `orders:users`):
-//
-//   1. (Phase 6.1, optional P3) Backfill those legacy orders into Postgres.
-//   2. (Phase 6.1, P2) Delete the stale `orders:user:*` keys + index from Redis.
-//
-// It is safe to run repeatedly: backfill skips orders whose id already exists in
-// Postgres, and key deletion is idempotent.
-//
-// Usage (PowerShell examples):
-//   node scripts/migrate-legacy-orders.mjs                 # dry run (default)
-//   node scripts/migrate-legacy-orders.mjs --apply         # backfill + delete keys
-//   node scripts/migrate-legacy-orders.mjs --apply --keep-redis     # backfill only
-//   node scripts/migrate-legacy-orders.mjs --apply --skip-backfill  # delete keys only
-//
-// Requires DATABASE_URL (for backfill) and REDIS_URL in the environment. The
-// script auto-loads `.env.local` then `.env` if present.
-
 import { readFileSync, existsSync } from "node:fs";
 import { createClient } from "redis";
 import { PrismaClient } from "@prisma/client";

@@ -114,10 +114,6 @@ export async function createOrderWithIdempotency(
   }
 }
 
-/**
- * Persists a paid order from a Stripe Checkout Session. Unique on
- * `stripeSessionId` so webhook retries are safe.
- */
 export async function createPaidOrderFromStripe(
   userId: string,
   input: OrderDraft,

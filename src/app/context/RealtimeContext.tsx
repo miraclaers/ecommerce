@@ -74,7 +74,6 @@ export function RealtimeProvider({
           setLatestEvent(parsed);
         }
       } catch {
-        // Ignore non-JSON messages from dev gateways.
       }
     };
 

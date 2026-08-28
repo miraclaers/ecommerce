@@ -25,7 +25,6 @@ export function isValidOrderId(orderId: string): boolean {
   return isValidUuid(orderId);
 }
 
-/** Opaque client key for POST /api/orders (Stripe-style Idempotency-Key). */
 export function isValidIdempotencyKey(key: string): boolean {
   return key.length >= 8 && key.length <= 255 && /^[\w.-]+$/.test(key);
 }

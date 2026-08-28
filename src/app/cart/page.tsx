@@ -159,7 +159,6 @@ export default function CartPage() {
                 key={item!.id}
                 className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white/70 p-5 sm:flex-row sm:items-start sm:gap-5 dark:border-zinc-800 dark:bg-zinc-900/60"
               >
-                {/* Image placeholder */}
                 <Image
                   src={item!.image}
                   alt={item!.title}
@@ -168,7 +167,6 @@ export default function CartPage() {
                   className="rounded-lg object-cover shrink-0"
                 />
 
-                {/* Product info */}
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">
                     {item!.title}
@@ -178,7 +176,6 @@ export default function CartPage() {
                     {item!.description}
                   </p>
 
-                  {/* Quantity & actions */}
                   <div className="mt-4 flex flex-wrap items-center gap-3 sm:gap-4">
                     <span className="font-semibold">
                       Quantity: {item!.quantity}
@@ -224,7 +221,6 @@ export default function CartPage() {
             ))}
           </ul>
 
-          {/* Footer */}
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <button
               onClick={clearCart}

@@ -7,7 +7,6 @@ export type SyncCartResult =
   | { ok: true; items: CartItem[] }
   | { ok: false; error: string };
 
-/** Persists the browser cart session to Redis (or in-memory fallback). */
 export async function syncCartAction(
   sessionId: string,
   items: CartItem[]

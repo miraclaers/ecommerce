@@ -1,6 +1,5 @@
 import type { Product } from "@/lib/types";
 
-/** Shared demo shipping policy shown on every product detail page. */
 export const STORE_SHIPPING = {
   disclaimer:
     "Demo store, no real fulfillment. Tracking numbers and carrier handoffs are simulated for portfolio purposes.",

@@ -79,7 +79,6 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         setOrders((prev) => mergeOrders(prev, remoteOrders));
       })
       .catch((error) => {
-        // Guests and demo mode stay on localStorage; only log unexpected failures.
         if (!isExpectedAuthFailure(error)) {
           console.error("[orders] fetchOrders failed", error);
         }
@@ -93,7 +92,6 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const addOrder = async (order: OrderDraft, idempotencyKey?: string) => {
     let created: Order;
 
-    // Demo / guest checkout: persist locally without hitting the auth-gated API.
     if (isSignedIn === false) {
       created = createLocalOrder(order);
     } else {

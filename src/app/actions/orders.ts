@@ -9,9 +9,6 @@ export type CancelOrderActionResult =
   | { ok: true; order: Order }
   | { ok: false; error: string };
 
-/**
- * Cancels a processing order for the signed-in user (My Purchases).
- */
 export async function cancelOrderAction(
   orderId: string
 ): Promise<CancelOrderActionResult> {

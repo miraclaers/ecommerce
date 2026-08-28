@@ -12,10 +12,6 @@ type FadeInProps = {
 
 const emptySubscribe = () => () => {};
 
-/**
- * Visible on SSR / before hydration (no opacity:0 flash).
- * Animates only after mount.
- */
 export function FadeIn({
   children,
   className,

@@ -14,9 +14,6 @@ type SpotlightCardProps = {
   className?: string;
 };
 
-/**
- * Soft pointer spotlight (React Bits–style), paint only, no layout shift.
- */
 export function SpotlightCard({ children, className = "" }: SpotlightCardProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);

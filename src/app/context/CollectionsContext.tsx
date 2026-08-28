@@ -69,7 +69,6 @@ function parseStoredCollections(raw: string | null): ProductCollection[] | null 
   try {
     const parsed = JSON.parse(raw);
 
-    // Backward compatibility for old structure: { gaming: ["1","2","3"] }
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
       return Object.entries(parsed).flatMap(([name, ids]) =>
         Array.isArray(ids)
