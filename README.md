@@ -79,3 +79,5 @@ docker compose up --build   # full local stack
 ```
 
 Env reference: [`.env.example`](./.env.example).
+
+Copyright 2026
